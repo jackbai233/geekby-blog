@@ -320,7 +320,7 @@ enableEmoji = true
         clientSecret = ""
       # Valine 评论系统设置
       [params.page.comment.waline]
-        enable = true
+        enable = false
         # 评论框默认提示
         placeholder = '踩踩...'
         # 每页展示多少条评论
