@@ -33,18 +33,17 @@
         {{- /* Waline Comment System */ -}}
         {{- $waline := $comment.waline | default dict -}}
         {{- if $waline.enable -}}
-            <div id="waline" class="comment">
-			  <script src='https://cdn.jsdelivr.net/npm/@waline/client/dist/Waline.min.js'></script>
+            <div id="waline" class="comment"></div>
+			  <script src='//cdn.jsdelivr.net/npm/@waline/client'></script>
 			  <script>
-				new Waline({
+				Waline({
 				  el: '#waline',
-				  path: location.pathname,
 				  placeholder: {{- $waline.placeholder -}},
 				  pageSize: {{- $waline.pageSize -}},
 				  serverURL: {{- $waline.serverURL -}}
 				});
 			  </script>
-			</div>
+			
             <noscript>
                 Please enable JavaScript to view the comments powered by <a href="https://valine.js.org/">Valine</a>.
             </noscript>

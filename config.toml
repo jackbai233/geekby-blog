@@ -325,7 +325,7 @@ enableEmoji = true
         placeholder = '踩踩...'
         # 每页展示多少条评论
         pageSize = 10
-        serverURL = "https://imtest-api.vercel.app/"
+        serverURL = "https://geekby-cn-waline-ei1fsqkwu-jackbai233.vercel.app/"
       [params.page.comment.valine]
         enable = false
         appId = ""
