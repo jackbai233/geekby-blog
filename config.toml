@@ -320,12 +320,12 @@ enableEmoji = true
         clientSecret = ""
       # Valine 评论系统设置
       [params.page.comment.waline]
-        enable = false
+        enable = true
         # 评论框默认提示
         placeholder = '踩踩...'
         # 每页展示多少条评论
         pageSize = 10
-        serverURL = "https://geekby-cn-waline-ei1fsqkwu-jackbai233.vercel.app/"
+        serverURL = "https://geekby-cn-waline.vercel.app/"
       [params.page.comment.valine]
         enable = false
         appId = ""

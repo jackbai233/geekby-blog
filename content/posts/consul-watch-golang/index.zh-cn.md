@@ -2,7 +2,7 @@
 weight: 4
 title: "使用Consul的watch机制监控服务的变化"
 date: 2021-07-10T11:09:53+08:00
-lastmod: 2021-07-10T11:09:53+08:00
+lastmod: 2021-07-14T11:09:53+08:00
 draft: false
 author: "JackBai"
 authorLink: "https://www.geekby.cn"
@@ -32,7 +32,7 @@ consul常常被用来作服务注册与服务发现，而它的watch机制则可
 
 > On subsequent requests for this resource, the client can set the `index` query string parameter to the value of `X-Consul-Index`, indicating that the client wishes to wait for any changes subsequent to that index.
 
-也就是说，blocking queries 属于长轮询的一种，如果 consul 的 http api (官方称作endpoint)支持 blocking queries，那么之后对该api 进行请求的时候添加`index`参数，那么该请求将会被阻塞，知道其请求的数据有变化时才会响应结果，换句话说，就是对该 endpoint 启动了长轮询。
+也就是说，blocking queries 属于长轮询的一种，如果 consul 的 http api (官方称作endpoint)支持 blocking queries，那么之后对该api 进行请求的时候添加`index`参数，那么该请求将会被阻塞，直到其请求的数据有变化时才会响应结果，换句话说，就是对该 endpoint 启动了长轮询。
 长轮训减少了频繁轮训的所造成的不必要的带宽和服务器资源开销，用在服务发现上，即时性也能有所保证。
 说了这么多，让我们来尝试一下：
 
