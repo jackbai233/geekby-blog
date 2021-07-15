@@ -30,25 +30,6 @@
             </noscript>
         {{- end -}}
 		
-        {{- /* Waline Comment System */ -}}
-        {{- $waline := $comment.waline | default dict -}}
-        {{- if $waline.enable -}}
-            <div id="waline" class="comment"></div>
-			  <script src='//cdn.jsdelivr.net/npm/@waline/client'></script>
-			  <script>
-				Waline({
-				  el: '#waline',
-				  placeholder: {{- $waline.placeholder -}},
-				  pageSize: {{- $waline.pageSize -}},
-				  serverURL: {{- $waline.serverURL -}}
-				});
-			  </script>
-			
-            <noscript>
-                Please enable JavaScript to view the comments powered by <a href="https://valine.js.org/">Valine</a>.
-            </noscript>
-        {{- end -}}
-
         {{- /* Valine Comment System */ -}}
         {{- $valine := $comment.valine | default dict -}}
         {{- if $valine.enable -}}
