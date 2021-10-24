@@ -7,9 +7,7 @@ draft: false
 author: "JackBai"
 authorLink: "https://www.geekby.cn"
 description: "这篇文章展示了基本的 Markdown 语法和格式."
-resources:
-- name: "featured-image"
-  src: "featured-image.png"
+featuredImage: "https://cdn.jsdelivr.net/gh/jackbai233/image-hosting@master/20211024/k8s-hostport.5q2orotgpvg0.png"
 
 tags: ["Markdown", "HTML"]
 categories: ["Markdown"]

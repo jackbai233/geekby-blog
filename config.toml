@@ -75,7 +75,7 @@ enableEmoji = true
   #  日期格式
   dateFormat = "2006-01-02"
   # 网站图片, 用于 Open Graph 和 Twitter Cards
-  images = ["/logo.png"]
+  images = ["/images/avatar.png"]
 
   #  应用图标配置
   [params.app]
@@ -186,7 +186,7 @@ enableEmoji = true
       # Gravatar 邮箱，用于优先在主页显示的头像
       gravatarEmail = ""
       # 主页显示头像的 URL
-      avatarURL = "avatar.png"
+      avatarURL = "/images/avatar.png"
       #  主页显示的网站标题 (支持 HTML 格式)
       title = ""
       # 主页显示的网站副标题
@@ -510,6 +510,7 @@ enableEmoji = true
 [author]
   name = "JackBai"
   email = "hfutbj233@163.com"
+  avatar = "/images/avatar.png"
   link = "https://github.com/jackbai233"
 
 # 网站地图配置
