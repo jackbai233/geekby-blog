@@ -7,7 +7,7 @@ draft: false
 author: "JackBai"
 authorLink: "https://www.geekby.cn"
 description: "这篇文章讲述了Consul的watch用法，以及使用Golang来监控Consul中service的变化."
-featuredImage: "featured-image.png"
+featuredImage: "https://cdn.jsdelivr.net/gh/jackbai233/image-hosting@master/20211024/consul-watch-golang.5mkggi49fvw0.png"
 
 tags: ["Consul", "Golang"]
 categories: ["分布式"]
