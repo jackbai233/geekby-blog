@@ -2,7 +2,7 @@
 weight: 4
 title: "使用Consul的watch机制监控服务的变化"
 date: 2021-07-10T11:09:53+08:00
-lastmod: 2021-07-14T11:09:53+08:00
+lastmod: 2022-05-21T11:09:53+08:00
 draft: false
 author: "JackBai"
 authorLink: "https://www.geekby.cn"
@@ -74,7 +74,7 @@ curl -v http://localhost:8500/v1/kv/loglevel?index=9981
 其中对各个监控类型的使用方法，见[官方文档](https://www.consul.io/docs/dynamic-app-config/watches#watch-types)
 ## Golang 实现watch 对服务变化的监控
 consul官方提供了[Golang版的watch包](https://pkg.go.dev/github.com/hashicorp/consul/api/watch)。其实际上也是对watch机制进行了一层封装，最终代码实现的还是对consul HTTP API 的 `endpoints`的使用。
-文章开始说过，“在监控到数据变化后，还可以调用外部处理程序”。是了，数据变化后调用外部处理程序才是有意义的，Golang的watch包中对应的外部处理程序是一个函数handler。因为业务的关系，这里只实现了watch对service的变化的监控，话不多说，上代码：
+文章开始说过，“在监控到数据变化后，还可以调用外部处理程序”。是了，数据变化后调用外部处理程序才是有意义的，Golang的watch包中对应的外部处理程序是一个函数handler。因为业务的关系，这里只实现了watch对service的变化的监控，其主要创建了一个plan 来对整个服务的变化做一个监控，以及再为每个服务创建一个 plan，对单个服务变化作监控。话不多说，上代码：
 ```golang
 package main
 
@@ -85,124 +85,129 @@ import (
 	"sync"
 )
 
-// watch包的使用方法为：1）使用watch.Parse(查询参数)生成Plan，2）绑定Plan的handler，3）运行Plan
+type WatchHandler interface {
+	Handler(uint64, interface{})
+}
 
-// 定义watcher
-type Watcher struct {
-	Address  string                 // consul agent 的地址："127.0.0.1:8500"
-	Wp       *watch.Plan            // 总的Services变化对应的Plan
-	watchers map[string]*watch.Plan // 对已经进行监控的service作个记录
+// ConsulWatch used to store all  plans
+type ConsulWatch struct {
+	watchers map[string]*watch.Plan // store plans
 	RWMutex  *sync.RWMutex
 }
 
-// 将consul新增的service加入，并监控
-func (w *Watcher) registerServiceWatcher(serviceName string) error {
-	// watch endpoint 的请求参数，具体见官方文档：https://www.consul.io/docs/dynamic-app-config/watches#service
-	wp, err := watch.Parse(map[string]interface{}{
-		"type":    "service",
-		"service": serviceName,
-	})
-	if err != nil {
-		return err
-	}
+// Handler used to watch whole consul services changes
+func (c ConsulWatch) Handler(_ uint64, data interface{}) {
+	switch d := data.(type) {
+	// "services" watch type returns map[string][]string type. follow:https://www.consul.io/docs/dynamic-app-config/watches#services
+	case map[string][]string:
+		fmt.Println("d: ", d)
+		for k := range d {
+			if _, ok := c.watchers[k]; ok || k == "consul" {
+				continue
+			}
+			// start creating one watch plan to watch every service
+			c.InsertServiceWatch(k)
+		}
 
-	// 定义service变化后所执行的程序(函数)handler
-	wp.Handler = func(idx uint64, data interface{}) {
-		switch d := data.(type) {
-		case []*consulapi.ServiceEntry:
-			for _, i := range d {
-				// 这里是单个service变化时需要做的逻辑，可以自己添加，或在外部写一个类似handler的函数传进来
-				fmt.Printf("service %s 已变化", i.Service.Service)
-				// 打印service的状态
-				fmt.Println("service status: ", i.Checks.AggregatedStatus())
+		// read watchers and delete deregister services
+		c.RWMutex.RLock()
+		defer c.RWMutex.RUnlock()
+		watchers := c.watchers
+		fmt.Println("watchers: ", watchers)
+		for k, plan := range watchers {
+			if _, ok := d[k]; !ok {
+				plan.Stop()
+				delete(watchers, k)
 			}
 		}
+	default:
+		fmt.Printf("can't decide the watch type: %v\n", &d)
 	}
-	// 启动监控
-	go wp.Run(w.Address)
-	// 对已启动监控的service作一个记录
-	w.RWMutex.Lock()
-	w.watchers[serviceName] = wp
-	w.RWMutex.Unlock()
-
-	return nil
 }
 
-func NewWatcher(watchType string, opts map[string]string, consulAddr string) (*Watcher, error) {
+// NewWatchPlan new watch plan
+func NewWatchPlan(watchType string, opts map[string]interface{}, handler WatchHandler) (*watch.Plan, error) {
 	var options = map[string]interface{}{
 		"type": watchType,
 	}
-	// 组装请求参数。(监控类型不同，其请求参数不同)
+	// combine params
 	for k, v := range opts {
 		options[k] = v
 	}
-
-	wp, err := watch.Parse(options)
+	pl, err := watch.Parse(options)
 	if err != nil {
 		return nil, err
 	}
-
-	w := &Watcher{
-		Address:  consulAddr,
-		Wp:       wp,
-		watchers: make(map[string]*watch.Plan),
-		RWMutex:  new(sync.RWMutex),
-	}
-
-	wp.Handler = func(idx uint64, data interface{}) {
-		switch d := data.(type) {
-		// 这里只实现了对services的监控，其他监控的data类型判断参考：https://github.com/dmcsorley/avast/blob/master/consul.go
-		// services
-		case map[string][]string:
-			for i := range d {
-				// 如果该service已经加入到ConsulRegistry的services里监控了，就不再加入 或者i 为 "consul"的字符串
-				// 为什么会多一个consul，参考官方文档services监听的返回值：https://www.consul.io/docs/dynamic-app-config/watches#services
-				if _, ok := w.watchers[i]; ok || i == "consul" {
-					continue
-				}
-				w.registerServiceWatcher(i)
-			}
-
-			// 从总的services变化中找到不再监控的service并停止
-			w.RWMutex.RLock()
-			watches := w.watchers
-			w.RWMutex.RUnlock()
-
-			// remove unknown services from watchers
-			for i, svc := range watches {
-				if _, ok := d[i]; !ok {
-					svc.Stop()
-					delete(watches, i)
-				}
-			}
-		default:
-			fmt.Printf("不能判断监控的数据类型: %v", &d)
-		}
-	}
-
-	return w, nil
+	pl.Handler = handler.Handler
+	return pl, nil
 }
 
-func RegisterWatcher(watchType string, opts map[string]string, consulAddr string) error {
-	w, err := NewWatcher(watchType, opts, consulAddr)
+func RunWatchPlan(plan *watch.Plan, address string) error {
+	defer plan.Stop()
+	err := plan.Run(address)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("run consul error: ", err)
 		return err
 	}
-	defer w.Wp.Stop()
-	if err = w.Wp.Run(consulAddr); err != nil {
-		fmt.Println("err: ", err)
-		return err
-	}
-
 	return nil
 }
 
-func main() {
-	address := "127.0.0.1:8500"
-	if err := RegisterWatcher("services", nil, address); err != nil {
-		fmt.Println("启动 consul 的watch监控失败")
+func StartConsulWatch() {
+	// please replace 10.xx.xx.xx with the ture ip address.
+	address := fmt.Sprintf("%s:%d", "10.xx.xx.xx", 8500)
+	cw := ConsulWatch{
+		watchers: make(map[string]*watch.Plan),
+		RWMutex:  new(sync.RWMutex),
 	}
+	wp, err := NewWatchPlan("services", nil, cw)
+	if err != nil {
+		fmt.Printf("new watch plan failed: %v\n", err)
+	}
+	err = RunWatchPlan(wp, address)
+	if err != nil {
+		return
+	}
+}
+
+// ServiceWatch is single service
+type ServiceWatch struct {
+	Address string
+}
+
+func (s ServiceWatch) Handler(_ uint64, data interface{}) {
+	switch d := data.(type) {
+	case []*consulapi.ServiceEntry:
+		for _, entry := range d {
+			fmt.Println(fmt.Sprintf("service ip %s ", entry.Service.Address))
+			fmt.Println("service status: ", entry.Checks.AggregatedStatus())
+		}
+
+	}
+}
+
+func (c ConsulWatch) InsertServiceWatch(serviceName string) {
+	serviceOpts := map[string]interface{}{
+		"service": serviceName,
+	}
+	sw := ServiceWatch{
+		// please replace 10.xx.xx.xx with the ture ip address.
+		Address: fmt.Sprintf("%s:%d", "10.xx.xx.xx", 8500),
+	}
+	servicePlan, err := NewWatchPlan("service", serviceOpts, sw)
+	if err != nil {
+		fmt.Printf("new service watch failed: %v", err)
+	}
+
+	go func() {
+		_ = RunWatchPlan(servicePlan, sw.Address)
+	}()
+	defer c.RWMutex.Unlock()
+	c.RWMutex.Lock()
+	c.watchers[serviceName] = servicePlan
+}
+
+func main() {
+	StartConsulWatch()
 }
 
 ```
