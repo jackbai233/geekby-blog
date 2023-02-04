@@ -7,7 +7,7 @@ draft: false
 author: "JackBai"
 authorLink: "https://www.geekby.cn"
 description: "这篇文章介绍了使用grpc实现双向通讯的方法."
-featuredImage: "https://cdn.jsdelivr.net/gh/jackbai233/image-hosting@master/20211024/python-grpc.55ic4zobjng0.png"
+featuredImage: "https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/python-grpc.55ic4zobjng0.png"
 
 tags: ["grpc"]
 categories: ["Python", "后端"]

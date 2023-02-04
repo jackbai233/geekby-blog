@@ -7,7 +7,7 @@ draft: false
 author: "JackBai"
 authorLink: "https://www.geekby.cn"
 description: "这篇文章介绍了使用golang实现ssh远程终端."
-featuredImage: "https://cdn.jsdelivr.net/gh/jackbai233/image-hosting@master/20211024/golang-ssh.2jel1ppf5va0.png"
+featuredImage: "https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/golang-ssh.2jel1ppf5va0.png"
 
 tags: ["Golang", "WebSocket"]
 categories: ["后端"]
@@ -207,10 +207,9 @@ HTML5开始提供的一种浏览器与服务器进行双工通讯的网络技术
 - 5. 后台通过 Socket连接通道拿到用户输入, 再通过SSH Channel将输入传给pty, pty将这些数据交给远程主机处理后按照前面指定的终端标准输出到SSH Channel中, 同时键盘输入也会发送给SSH Channel
 - 6. 后台从SSH Channel中拿到按照终端大小的标准输出后又通过Socket连接将输出返回给浏览器, 由此变实现了Web Terminal
 
-![avatar](https://cdn.jsdelivr.net/gh/jackbai233/image-hosting@master/20211024/image.54fxpcesfi00.png)
+![image](https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/image.2qsqdsa5h4o0.png)
 
-
-![avatar2](https://cdn.jsdelivr.net/gh/jackbai233/image-hosting@master/20211024/image.2qsqdsa5h4o0.png)
+![image](https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/image.54fxpcesfi00.png)
 
 按照上面的使用流程基于代码解释如何实现
 ### 升级HTTP协议为WebSocket

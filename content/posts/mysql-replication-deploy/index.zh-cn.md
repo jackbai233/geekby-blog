@@ -4,10 +4,10 @@ title: "MySQL 搭建主从复制环境"
 date: 2022-05-08T09:59:05+08:00
 lastmod: 2022-05-08T09:59:05+08:00
 draft: false
-author: "JackBai"
+author: "geekby"
 authorLink: "https://www.geekby.cn"
 description: "这篇文章介绍了在docker环境下搭建MySQL主从复制环境的过程."
-featuredImage: "https://cdn.jsdelivr.net/gh/jackbai233/image-hosting@master/20211024/mysql-replication-deploy.5y7m9pwx1iw0.webp"
+featuredImage: "https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/mysql-replication-deploy.5y7m9pwx1iw0.webp"
 
 tags: ["MySQL"]
 categories: ["后端"]

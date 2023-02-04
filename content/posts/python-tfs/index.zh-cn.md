@@ -7,7 +7,7 @@ draft: false
 author: "JackBai"
 authorLink: "https://www.geekby.cn"
 description: "这篇文章介绍了怎样使用python来操作微软的tfs中的work item。"
-featuredImage: "https://cdn.jsdelivr.net/gh/jackbai233/image-hosting@master/20211024/python-tfs.5r4p0wc7jjo0.png"
+featuredImage: "https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/python-tfs.5r4p0wc7jjo0.png"
 
 tags: ["tfs"]
 categories: ["Python"]

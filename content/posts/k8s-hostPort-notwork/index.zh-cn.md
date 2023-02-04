@@ -7,7 +7,7 @@ draft: false
 author: "JackBai"
 authorLink: "https://www.geekby.cn"
 description: "k8s中，当pod中容器的网络模式为`hostPort`时，其结果并未生效的问题，并就该问题进行了分析解决。"
-featuredImage: "https://cdn.jsdelivr.net/gh/jackbai233/image-hosting@master/20211024/k8s-hostport.5q2orotgpvg0.png"
+featuredImage: "https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/k8s-hostport.5q2orotgpvg0.png"
 
 tags: ["k8s"]
 categories: ["云原生"]

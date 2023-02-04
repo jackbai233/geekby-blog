@@ -7,7 +7,7 @@ draft: false
 author: "JackBai"
 authorLink: "https://www.geekby.cn"
 description: "这篇文章介绍了怎样在Django中实现登录后跳转."
-featuredImage: "https://cdn.jsdelivr.net/gh/jackbai233/image-hosting@master/20211024/django-login.303wk0edalg0.png"
+featuredImage: "https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/django-login.303wk0edalg0.png"
 
 tags: ["Django"]
 categories: ["Python", "后端"]

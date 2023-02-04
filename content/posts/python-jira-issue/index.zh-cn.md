@@ -7,7 +7,7 @@ draft: false
 author: "JackBai"
 authorLink: "https://www.geekby.cn"
 description: "这篇文章讲述了怎样利用python来操作jira中的issues。"
-featuredImage: "https://cdn.jsdelivr.net/gh/jackbai233/image-hosting@master/20211024/python-jira.7170xk7v9p40.png"
+featuredImage: "https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/python-jira.7170xk7v9p40.png"
 
 tags: ["jira"]
 categories: ["Python"]

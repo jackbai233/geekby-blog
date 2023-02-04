@@ -7,7 +7,7 @@ draft: false
 author: "JackBai"
 authorLink: "https://www.geekby.cn"
 description: "怎样在Linux下检测硬盘可用空间(使用终端或图形化界面)"
-featuredImage: 'https://cdn.jsdelivr.net/gh/jackbai233/image-hosting@master/20211024/linx-df.4i5gd5a2pmo0.png'
+featuredImage: 'https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/linx-df.4i5gd5a2pmo0.png'
 
 tags: ["ubuntu", "command"]
 categories: ["Linux"]
@@ -33,7 +33,7 @@ df -h
 添加`-h`选项，它会以人性化(human-readable)的方式向你展示磁盘空间内容(MB或GB)。
 下面是我仅安装了Linux和加密磁盘的Dell XPS系统下df命令的输出内容：
 
-![Linux下通过df命令检查磁盘可用空间](https://i1.wp.com/itsfoss.com/wp-content/uploads/2020/11/free-disk-space-linux-df-command-output.png?w=786&ssl=1)
+![Linux下通过df命令检查磁盘可用空间](https://itsfoss.com/content/images/wordpress/2020/11/free-disk-space-linux-df-command-output.png)
 
 如果上面的命令你不太理解，没关系，我将向你推荐一些关于在Linux下检查磁盘空间的方法。**我将介绍一些图形化操作给Linux桌面使用者**。
 ### 方法一：使用df命令检查磁盘可用空间（并明白其输出内容）
@@ -47,7 +47,7 @@ df -h
 您可以从挂载点确定哪个分区被用于什么目的。 如根目录(Root)挂载在/下，EFI挂载在/boot/EFI下等。
 在我这里，我已经用完root下232 GB磁盘空间的41％，如果你有2-3个大的分区(像root、home等)，您将需要在此处进行计算：
 
-![明白df命令的输出](https://i1.wp.com/itsfoss.com/wp-content/uploads/2020/11/df-command-output.png?w=800&ssl=1)
+![明白df命令的输出](https://itsfoss.com/content/images/wordpress/2020/11/df-command-output.png)
 
 - **tmpfs**: `tmpfs`(临时文件系统) 被用来保持文件到虚拟内存中，你可以忽略这个虚拟文件系统。
 - **udev**: `udev 文件系统`被用来存储一些插入到你的系统上的设备信息(如USB、网卡、光驱等)，你也可以忽略它。
@@ -56,12 +56,12 @@ df -h
 请记住，df命令仅显示已挂载文件系统的磁盘空间。如果你在同一个磁盘下使用了不止一个Linux发行版系统(或者操作系统)，或者系统上有多个磁盘。你则需要先挂载它们，然后再查看这些分区和磁盘上的可用空间。
 举个例子，我的 [Intel NUC](https://itsfoss.com/install-linux-on-intel-nuc/)上的两个固态硬盘安装了4到5个Linux发行版系统，只有当我显式地挂载它们时，它们的磁盘信息才会显示。
 
-![](https://i2.wp.com/itsfoss.com/wp-content/uploads/2020/11/df-command-ubuntu-1.png?resize=786%2C443&ssl=1)
-![](https://i0.wp.com/itsfoss.com/wp-content/uploads/2020/11/df-command-ubuntu.png?resize=786%2C443&ssl=1)
+![](https://itsfoss.com/content/images/wordpress/2020/11/df-command-ubuntu-1.png)
+![](https://itsfoss.com/content/images/wordpress/2020/11/df-command-ubuntu.png)
 
 你可以使用 `lsblk` 命令来查看所有磁盘信息和分区信息。
 
-![](https://i1.wp.com/itsfoss.com/wp-content/uploads/2020/11/lsblk-command-to-see-disks-linux.png?w=786&ssl=1)
+![](https://itsfoss.com/content/images/wordpress/2020/11/lsblk-command-to-see-disks-linux.png)
 
 有了磁盘分区名称后，你就可以用以下方式挂载它：
 ```shell
@@ -72,19 +72,19 @@ sudo mount /dev/sdb2 /mnt
 ### 方法二：图形化操作检查磁盘可用空间
 在Ubuntu中，使用Disk Usage Analyzer工具以图形方式检查可用磁盘空间要容易得多。
 
-![Disk Usage Analyzer Tool](https://i0.wp.com/itsfoss.com/wp-content/uploads/2020/11/disk-usage-analyzer-tool-linux.jpg?w=800&ssl=1)
+![Disk Usage Analyzer Tool](https://itsfoss.com/content/images/wordpress/2020/11/disk-usage-analyzer-tool-linux.jpg)
 
 您将会看到所有实际的磁盘和分区。 您可以通过单击某些分区来挂载它们。 Disk Usage Analyzer Tool 会显示所有已挂载分区的磁盘使用情况。
 
-![Disk usage check](https://i0.wp.com/itsfoss.com/wp-content/uploads/2020/11/free-disk-space-ubuntu-desktop.png?resize=800%2C648&ssl=1)
+![Disk usage check](https://itsfoss.com/content/images/wordpress/2020/11/free-disk-space-ubuntu-desktop-800x648.png)
 
 #### 使用GNOME磁盘实用工具检查可用磁盘空间
 
-![GNOME Disks Tool](https://i2.wp.com/itsfoss.com/wp-content/uploads/2020/11/disks-tool-linux.jpg?w=800&ssl=1)
+![GNOME Disks Tool](https://itsfoss.com/content/images/wordpress/2020/11/disks-tool-linux.jpg)
 
 打开工具然后选择一个磁盘，选择一个分区来查看磁盘剩余空间，如果一个分区没有被挂载，通过点击“play”按钮来挂载它。
 
-![剩余磁盘空间在Ubuntu桌面显示](https://i1.wp.com/itsfoss.com/wp-content/uploads/2020/11/free-disk-space-check-ubuntu-desktop.png?w=800&ssl=1)
+![剩余磁盘空间在Ubuntu桌面显示](https://itsfoss.com/content/images/wordpress/2020/11/free-disk-space-check-ubuntu-desktop.png)
 
 我认为所有主流的Linux发行版环境都有相关的图形化操作工具来检查磁盘空间，你可以在Linux桌面上通过搜索菜单来找到它们。
 ### 总结

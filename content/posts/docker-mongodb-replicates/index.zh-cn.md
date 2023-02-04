@@ -7,7 +7,7 @@ draft: false
 author: "JackBai"
 authorLink: "https://www.geekby.cn"
 description: "本篇文章介绍了怎样在Docker下搭建MongoDB副本集。"
-featuredImage: "https://cdn.jsdelivr.net/gh/jackbai233/image-hosting@master/20211024/docker-mongoDB.acenfa6dzrc.png"
+featuredImage: "https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/docker-mongoDB.acenfa6dzrc.png"
 
 tags: ["Docker", "MongoDB"]
 categories: ["云原生"]

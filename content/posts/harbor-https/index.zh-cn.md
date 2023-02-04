@@ -7,7 +7,7 @@ draft: false
 author: "JackBai"
 authorLink: "https://www.geekby.cn"
 description: "本篇文章介绍了怎样使用自签名的证书配置Harbor的https."
-featuredImage: "https://cdn.jsdelivr.net/gh/jackbai233/image-hosting@master/20211024/harbor-https.5rj63h0kqg40.png"
+featuredImage: "https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/harbor-https.5rj63h0kqg40.png"
 
 tags: ["Harbor", "https"]
 categories: ["云原生"]

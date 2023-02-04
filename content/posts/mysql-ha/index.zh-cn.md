@@ -7,7 +7,7 @@ draft: false
 author: "JackBai"
 authorLink: "https://www.geekby.cn"
 description: "这篇文章讲述了 MySQL 高可用的几种方案"
-featuredImage: "https://cdn.jsdelivr.net/gh/jackbai233/image-hosting@master/20211024/Image-(6).2g16fjf5jls0.webp"
+featuredImage: "https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/Image-(6).2g16fjf5jls0.webp"
 
 tags: ["MySQL"]
 categories: ["后端"]
@@ -44,13 +44,13 @@ lightgallery: true
 下面主要介绍了一些实施高可用主流方案。
 #### 缓存层--数据库读写
 在谈及高可用方案时，有时候我们会考虑对于用户侧的影响，有时候用户并不需要频繁地修改数据，而只是查看数据，这时我们可以在应用与数据库之间添加一层缓存：
-{{< figure src="https://cdn.jsdelivr.net/gh/jackbai233/image-hosting@master/20211024/dha_cache.24f9vfyggjx.webp" title="dha_cache" >}}
+{{< figure src="https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/dha_cache.24f9vfyggjx.webp" title="dha_cache" >}}
 
 对于读的缓存，我们有许多方案： memcached、Redis、couchbase等。缓存的刷新可以在需要时由后台线程从数据库中读取数据并写入到缓存里进行刷新。当然当数据库服务掉线或后台线程不能刷新时，缓存的数据会过期。不过当数据库掉线后，应用后台可以从缓存里获取数据提供给用户，短期来看，对用户来说并不会有糟糕的体验。
 
 #### 块级别复制(DRBD)
 DRBD(Distributed Replicated Block Device, 分布式复制块设备)是一个软件实现的、无共享的、服务器之间镜像块设备内容的存储复制解决方案。简单说，DRBD是实现活动节点存储数据变动后自动复制到备用节点相应存储位置的软件。
-{{< figure src="https://cdn.jsdelivr.net/gh/jackbai233/image-hosting@master/20211024/image.6ghy5rmz9p00.webp" title="drbd" >}}
+{{< figure src="https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/image.6ghy5rmz9p00.webp" title="drbd" >}}
 
 上图是DRBD的工作栈模型，可以看到DRBD需要运行在各个节点上，且运行在节点主机的内核中(Linx2.6.33版本起DRBD已整合进内核模块)。
 
@@ -63,7 +63,7 @@ DRBD有几个缺点，首先，该方案中只能使用一个节点(即活动节
 #### MySQL主从复制(MySQL Replication)
       
 MySQL主从复制是最经典和也许最流行实现MySQL高可用的方案之一，它的架构一般为[master-slave模式](https://zh.wikipedia.org/wiki/%E4%B8%BB%E4%BB%8E%E6%A8%A1%E5%BC%8F)。如下图：
-{{< figure src="https://cdn.jsdelivr.net/gh/jackbai233/image-hosting@master/20211024/image.1q0hnsqgvjq8.webp" title="replication" >}}
+{{< figure src="https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/image.1q0hnsqgvjq8.webp" title="replication" >}}
 
 它将来自一台 MySQL 数据库服务器（源,即master）的数据复制到一台或多台 MySQL 数据库服务器（副本）。复制默认是异步的，因此副本不需要永久连接来接收来自源的更新。这意味着更新可以通过长距离连接进行，甚至可以通过临时或间歇性连接（如拨号服务）进行。根据配置，您可以复制数据库中的所有数据库、选定的数据库甚至选定的表。
 
@@ -111,7 +111,7 @@ MySQL 5.6.5 及更高版本支持基于 全局事务标识符 (GTID) 的事务�
       
 #### MySQL 集群(Cluster)  
 最后的(也是最终的)一个方案是使用一种同步模式的集群，它就是 MySQL Cluster(也称为MySQL NDB Cluster)。MySQL Cluster 与我们平时使用的MySQL存储引擎 InnoDB 不同，它基于 NDB 存储引擎，该存储引擎专门为 Cluster 而设计，它主要将数据存储在内存中，并且独立于MySQL server 实例。NDB 代表“网络数据库”。如下为官方的 Cluster 组件示例图：
-{{< figure src="https://cdn.jsdelivr.net/gh/jackbai233/image-hosting@master/20211024/image.43azpr1mw360.webp" title="cluster" >}}
+{{< figure src="https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/image.43azpr1mw360.webp" title="cluster" >}}
 
 MySQL NDB Cluster 使用非共享架构，通过多台服务器构建成集群，实现多点读写的关系型数据库。它具有在线维护功能，并且排除单一故障，具有非常高的可用性。此外，它的主要数据保存在内存中，可以高速处理大量的事务，是面向实时性应用程序的一款数据库产品。
 
@@ -126,7 +126,7 @@ MySQL NDB Cluster 不是常规的 MySQL/InnoDB，行为也不同。它存储数�
 最小的 Galera 集群由3个节点组成，建议使用奇数个节点运行。原因是，如果在一个节点上应用事务出现问题(例如，网络问题或计算机变得没有响应) ，另外两个节点将有仲裁(即多数) ，并能够继续进行事务提交。
 
 下图展示了 MySQL Replication 和 Galera Cluster 之间的一些差异：
-{{< figure src="https://cdn.jsdelivr.net/gh/jackbai233/image-hosting@master/20211024/dha_galera.5842p8tgjuo0.webp" title="dha_galera" >}}
+{{< figure src="https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/dha_galera.5842p8tgjuo0.webp" title="dha_galera" >}}
       
 Galera Cluster 相较于传统的 MySQL Replication 有以下好处：
 - 具有同步复制、故障转移和重新同步的高可用性解决方案。
@@ -143,11 +143,11 @@ Galera Cluster 相较于传统的 MySQL Replication 有以下好处：
 通过这样或那样的方式设置 MySQL 是不足以实现高可用性的。下一步将是解决另一个问题：“我应该如何连接到数据库层，以便我总是连接到主机是一直可用的？”，其中一个答案就是使用代理层。
 ##### HAProxy
 HAProxy 大概是 MySQL 世界里最流行的一个TCP/HTTP 负载平衡器。它非常轻快、易配置。它是免费、快速并且可靠的一种解决方案。对于 MySQL Replication 或者 Galera Cluster，我们可以利用 haproxy 在 tcp 层对数据库的读请求进行代理，从而实现多个库的负载均衡。其工作的示意图如下：
-{{< figure src="https://cdn.jsdelivr.net/gh/jackbai233/image-hosting@master/20211024/dha_haproxy.4q0xkm7qjxg0.webp" title="haproxy" >}}
+{{< figure src="https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/dha_haproxy.4q0xkm7qjxg0.webp" title="haproxy" >}}
     
 ##### MaxScale
 另一个最新的代理方案时 MaxScale。它是一款由 mariadb 公司出品的中间件 Maxscale，该中间件能实现读写分离和读负载均衡，安装和配置都十分简单。与 HAProxy 的主要区别在于 MaxScale 是数据库感知的。它旨在与 MySQL 一起使用，并为 DBA 提供了更大的灵活性。除了作为代理之外，它还具有大量功能。例如，如果您需要一个 binlog 服务器，MaxScale 可以在这里为您提供帮助。但从 HA 的角度来看，最重要的特性是它能够理解 MySQL 状态。如果您使用传统的 Mysql Replication，MaxScale 将能够确定哪个节点是主节点，哪个节点是从节点。在故障转移的情况下，这可以减少需要记住的配置更改。
-{{< figure src="https://cdn.jsdelivr.net/gh/jackbai233/image-hosting@master/20211024/dha_maxscale.2kz798r90ma0.webp" title="maxscale" >}}
+{{< figure src="https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/dha_maxscale.2kz798r90ma0.webp" title="maxscale" >}}
     
 ## 总结
 MySQL 中的高可用性是一个复杂的主题，需要大量的研究，并且很大程度上取决于您使用的环境。比起一篇文章，可能更适合以一本书来讨论，上述只是列出了一些主要的方案，具体的部署细节并未给出，更多详情可以自行查询搜索。

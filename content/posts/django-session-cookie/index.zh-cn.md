@@ -7,7 +7,7 @@ draft: false
 author: "JackBai"
 authorLink: "https://www.geekby.cn"
 description: "这篇文章介绍了在Django下使用Session和Cookie."
-featuredImage: "https://cdn.jsdelivr.net/gh/jackbai233/image-hosting@master/20211024/django-session.65zgb9wmmrs0.png"
+featuredImage: "https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/django-session.65zgb9wmmrs0.png"
 
 tags: ["Django", "session", "cookie"]
 categories: ["Python", "后端"]

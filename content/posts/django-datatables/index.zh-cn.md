@@ -7,7 +7,7 @@ draft: false
 author: "JackBai"
 authorLink: "https://www.geekby.cn"
 description: "这篇文章总结了怎样在Django中使用DataTables."
-featuredImage: "https://cdn.jsdelivr.net/gh/jackbai233/image-hosting@master/20211024/django-datatables.4s58ppjmua60.png"
+featuredImage: "https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/django-datatables.4s58ppjmua60.png"
 
 tags: ["Django", "DataTables"]
 categories: ["Python"]
