@@ -1,2 +1,0 @@
-# geekby-blog
-my blog
