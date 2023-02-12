@@ -1,0 +1,306 @@
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="noodp"><title class=pjax-title>python操作TFS的Work Item - geekbyの自留地</title><meta name=Description content="这篇文章介绍了怎样使用python来操作微软的tfs中的work item。"><meta property="og:title" content="python操作TFS的Work Item"><meta property="og:description" content="这篇文章介绍了怎样使用python来操作微软的tfs中的work item。"><meta property="og:type" content="article"><meta property="og:url" content="https://www.geekby.cn/python-tfs/"><meta property="og:image" content="https://www.geekby.cn/images/avatar.png"><meta property="article:section" content="posts"><meta property="article:published_time" content="2020-04-25T16:00:45+08:00"><meta property="article:modified_time" content="2020-04-25T16:00:45+08:00"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://www.geekby.cn/images/avatar.png"><meta name=twitter:title content="python操作TFS的Work Item"><meta name=twitter:description content="这篇文章介绍了怎样使用python来操作微软的tfs中的work item。"><meta name=application-name content="geekby"><meta name=apple-mobile-web-app-title content="geekby"><meta name=theme-color content="#f8f8f8"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=canonical href=https://www.geekby.cn/python-tfs/><link rel=prev href=https://www.geekby.cn/django-datatables/><link rel=next href=https://www.geekby.cn/docker-mongodb-replicates/><link rel=stylesheet href=/lib/normalize/normalize.min.css><link rel=stylesheet href=/css/style.min.css><link rel=preload as=style onload='this.onload=null,this.rel="stylesheet"' href=/lib/fontawesome-free/all.min.css><noscript><link rel=stylesheet href=/lib/fontawesome-free/all.min.css></noscript><link rel=preload as=style onload='this.onload=null,this.rel="stylesheet"' href=/lib/animate/animate.min.css><noscript><link rel=stylesheet href=/lib/animate/animate.min.css></noscript><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"python操作TFS的Work Item","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/www.geekby.cn\/python-tfs\/"},"genre":"posts","keywords":"tfs","wordcount":1799,"url":"https:\/\/www.geekby.cn\/python-tfs\/","datePublished":"2020-04-25T16:00:45+08:00","dateModified":"2020-04-25T16:00:45+08:00","publisher":{"@type":"Organization","name":""},"author":{"@type":"Person","name":"JackBai"},"description":"这篇文章介绍了怎样使用python来操作微软的tfs中的work item。"}</script></head><body header-desktop=fixed header-mobile=auto><script type=text/javascript>function setTheme(e){document.body.setAttribute("theme",e)}function saveTheme(e){window.localStorage&&localStorage.setItem("theme",e)}function getMeta(e){const t=document.getElementsByTagName("meta");for(let n=0;n<t.length;n++)if(t[n].getAttribute("name")===e)return t[n];return""}if(window.localStorage&&localStorage.getItem("theme")){let e=localStorage.getItem("theme");e==="light"||e==="dark"||e==="black"?setTheme(e):setTheme(window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")}else"auto"==="light"||"auto"==="dark"||"auto"==="black"?(setTheme("auto"),saveTheme("auto")):(saveTheme("auto"),setTheme(window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"));let metaColors={light:"#f8f8f8",dark:"#252627",black:"#000000"};getMeta("theme-color").content=metaColors[document.body.getAttribute("theme")]</script><div id=back-to-top></div><div id=mask></div><div class=wrapper><header class=desktop id=header-desktop><div class=header-wrapper><div class=header-title><a href=/ title=geekbyの自留地>geekbyの自留地</a></div><div class=menu><div class=menu-inner><a class=menu-item href=/posts/>文章 </a><a class=menu-item href=/tags/>标签 </a><a class=menu-item href=/categories/>分类 </a><a class=menu-item href=/about/>关于 </a><a class=menu-item href=https://github.com/jackbai233 title=Github rel="noopener noreffer" target=_blank><i class='fab fa-github fa-fw'></i> </a><span class="menu-item delimiter"></span><span class="menu-item search" id=search-desktop>
+<input type=text placeholder=搜索文章标题或内容... id=search-input-desktop>
+<a href=# onclick=return!1 class="search-button search-toggle" id=search-toggle-desktop title=搜索><i class="fas fa-search fa-fw"></i></a>
+<a href=# onclick=return!1 class="search-button search-clear" id=search-clear-desktop title=清空><i class="fas fa-times-circle fa-fw"></i></a>
+<span class="search-button search-loading" id=search-loading-desktop><i class="fas fa-spinner fa-fw fa-spin"></i></span>
+</span><a href=# onclick=return!1 class="menu-item theme-switch" title=切换主题><i class="fas fa-adjust fa-fw"></i></a></div></div></div></header><header class=mobile id=header-mobile><div class=header-container><div class=header-wrapper><div class=header-title><a href=/ title=geekbyの自留地>geekbyの自留地</a></div><div class=menu-toggle id=menu-toggle-mobile><span></span><span></span><span></span></div></div><div class=menu id=menu-mobile><div class=search-wrapper><div class="search mobile" id=search-mobile><input type=text placeholder=搜索文章标题或内容... id=search-input-mobile>
+<a href=# onclick=return!1 class="search-button search-toggle" id=search-toggle-mobile title=搜索><i class="fas fa-search fa-fw"></i></a>
+<a href=# onclick=return!1 class="search-button search-clear" id=search-clear-mobile title=清空><i class="fas fa-times-circle fa-fw"></i></a>
+<span class="search-button search-loading" id=search-loading-mobile><i class="fas fa-spinner fa-fw fa-spin"></i></span></div><a href=# onclick=return!1 class=search-cancel id=search-cancel-mobile>取消</a></div><a class=menu-item href=/posts/ title>文章</a><a class=menu-item href=/tags/ title>标签</a><a class=menu-item href=/categories/ title>分类</a><a class=menu-item href=/about/ title>关于</a><a class=menu-item href=https://github.com/jackbai233 title=Github rel="noopener noreffer" target=_blank><i class='fab fa-github fa-fw'></i></a><a href=# onclick=return!1 class="menu-item theme-switch" title=切换主题>
+<i class="fas fa-adjust fa-fw"></i></a></div></div></header><div class="search-dropdown desktop"><div id=search-dropdown-desktop></div></div><div class="search-dropdown mobile"><div id=search-dropdown-mobile></div></div><main class=main><div class=container><div class=toc id=toc-auto><h2 class=toc-title>目录</h2><div class=toc-content id=toc-content-auto></div></div><script>document.getElementsByTagName("main")[0].setAttribute("pageStyle","normal")</script><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC","true")</script><article class="page single"><h1 class="single-title animate__animated animate__flipInX">python操作TFS的Work Item</h1><div class=post-meta><div class=post-meta-line><span class=post-author><i class="author fas fa-user-circle fa-fw"></i><a href=https://www.geekby.cn title=Author target=_blank rel="noopener noreffer author" class=author>JackBai</a>
+</span>&nbsp;<span class=post-category>收录于 </span>&nbsp;<span class=post-category>类别 <a href=/categories/python/><i class="far fa-folder fa-fw"></i>Python</a></span></div><div class=post-meta-line><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime=2020-04-25>2020-04-25</time>&nbsp;<i class="far fa-edit fa-fw"></i>&nbsp;<time datetime=2020-04-25>2020-04-25</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 1799 字&nbsp;
+<i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 4 分钟&nbsp;<span id=/python-tfs/ class=leancloud_visitors data-flag-title="python操作TFS的Work Item">
+<i class="far fa-eye fa-fw"></i>&nbsp;<span class=leancloud-visitors-count></span>&nbsp;次阅读
+</span>&nbsp;<span id=/python-tfs/ class=comment_count data-flag-title="python操作TFS的Work Item">
+<i class="far fa-comments fa-fw"></i>&nbsp;<span class=waline-comment-count id=waline-comment-count></span>&nbsp;条评论
+</span>&nbsp;</div></div><div class=featured-image><img class=lazyload data-src=https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/python-tfs.5r4p0wc7jjo0.png data-srcset="https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/python-tfs.5r4p0wc7jjo0.png, https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/python-tfs.5r4p0wc7jjo0.png 1.5x, https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/python-tfs.5r4p0wc7jjo0.png 2x" data-sizes=auto alt=https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/python-tfs.5r4p0wc7jjo0.png title="这篇文章介绍了怎样使用python来操作微软的tfs中的work item。" height=auto width=auto></div><div class="details toc" id=toc-static kept><div class="details-summary toc-title"><span>目录</span>
+<span><i class="details-icon fas fa-angle-right"></i></span></div><div class="details-content toc-content" id=toc-content-static><nav id=TableOfContents><ul><li><a href=#条件准备>条件准备</a><ul><li><a href=#1-安装库>1. 安装库</a></li><li><a href=#2-获取token>2. 获取Token</a></li></ul></li><li><a href=#操作tfs>操作TFS</a></li></ul></nav></div></div><div class=content id=content><p>因工作需要，现需要将jira切换到微软的TFS(Team Foundation Server)，并自动化创建TFS的任务(即 Work Item)。根据该需求，我首先使用了它的<a href="https://docs.microsoft.com/zh-cn/rest/api/azure/devops/wit/work%20items?view=azure-devops-rest-6.0" target=_blank rel="noopener noreffer">REST API</a>进行尝试，但发现有些麻烦，后面找到了一个python库dohq-tfs，该库<a href=https://devopshq.github.io/tfs/installation.html target=_blank rel="noopener noreffer">文档</a>友好，操作简单方便，很适合快速的开发相应的脚本。</p><h2 id=条件准备>条件准备</h2><h3 id=1-安装库>1. 安装库</h3><p>使用pip安装dohq-tfs库，如下：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>pip install dohq-tfs
+</span></span></code></pre></td></tr></table></div></div><h3 id=2-获取token>2. 获取Token</h3><p>登录到TFS系统，点击个人头像，找到安全性选项，在安全性选项下添加一个“个人访问令牌”，即个人token，复制该token信息，后续脚本中要用到。（经测试通过dohq-tfs库创建Work Item时直接使用用户和密码无法成功，而使用token却是可以的）</p><h2 id=操作tfs>操作TFS</h2><p>我们知道创建Work Item肯定是在TFS的某个项目下进行创建的。这里需要说明的是，无论是通过脚本创建work item还是获取work item，首先需要知道work item里面有哪些字段信息。我这里获取Work Item的字段信息方法是： <strong>先手动在TFS上创建一个Work Item，然后获取该Work Item的API即可知道Work Item有哪些字段信息</strong>。例如：我在TFS系统(网址为https://tfshost.com.cn/tfs/)的名为XB的项目下创建了一个任务项(Work Item)，该任务项的id为233，则该Work Item的api一般为：“https://tfshost.com.cn/tfs/XB/_apis/wit/workitems/233?api-version=1.0&api-version=1.0” （TFS<a href="https://docs.microsoft.com/zh-cn/rest/api/azure/devops/wit/work%20items/get%20work%20item?view=azure-devops-rest-6.0" target=_blank rel="noopener noreffer">官网</a>也有Work Item的api组成介绍）。该api网址返回的是一些json格式的数据信息，具体如下：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl><span class=nt>&#34;id&#34;</span><span class=p>:</span><span class=mi>233</span><span class=p>,</span>
+</span></span><span class=line><span class=cl><span class=nt>&#34;rev&#34;</span><span class=p>:</span><span class=mi>5</span><span class=p>,</span>
+</span></span><span class=line><span class=cl><span class=nt>&#34;fields&#34;</span><span class=p>:{</span>
+</span></span><span class=line><span class=cl><span class=nt>&#34;System.AreaPath&#34;</span><span class=p>:</span><span class=s2>&#34;XB&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl><span class=nt>&#34;System.TeamProject&#34;</span><span class=p>:</span><span class=s2>&#34;XB&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl><span class=nt>&#34;System.IterationPath&#34;</span><span class=p>:</span><span class=s2>&#34;XB&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl><span class=nt>&#34;System.WorkItemType&#34;</span><span class=p>:</span><span class=s2>&#34;Task&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl><span class=nt>&#34;System.State&#34;</span><span class=p>:</span><span class=s2>&#34;New&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl><span class=nt>&#34;System.Reason&#34;</span><span class=p>:</span><span class=s2>&#34;New&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl><span class=nt>&#34;System.AssignedTo&#34;</span><span class=p>:</span><span class=s2>&#34;张三&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl><span class=nt>&#34;System.CreatedDate&#34;</span><span class=p>:</span><span class=s2>&#34;2020-03-09T02:16:28.847Z&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl><span class=nt>&#34;System.CreatedBy&#34;</span><span class=p>:</span><span class=s2>&#34;张三&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl><span class=nt>&#34;System.ChangedDate&#34;</span><span class=p>:</span><span class=s2>&#34;2020-03-09T07:01:45.317Z&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl><span class=nt>&#34;System.ChangedBy&#34;</span><span class=p>:</span><span class=s2>&#34;张三&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl><span class=nt>&#34;System.Title&#34;</span><span class=p>:</span><span class=s2>&#34;自动创建的任务&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl><span class=nt>&#34;Microsoft.VSTS.Common.StateChangeDate&#34;</span><span class=p>:</span><span class=s2>&#34;2020-03-09T02:16:28.847Z&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl><span class=nt>&#34;Microsoft.VSTS.Common.Priority&#34;</span><span class=p>:</span><span class=mi>2</span><span class=p>,</span>
+</span></span><span class=line><span class=cl><span class=nt>&#34;Microsoft.VSTS.Scheduling.FinishDate&#34;</span><span class=p>:</span><span class=s2>&#34;2020-03-25T16:00:00Z&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl><span class=nt>&#34;Microsoft.VSTS.Scheduling.OriginalEstimate&#34;</span><span class=p>:</span><span class=mf>20.0</span><span class=p>,</span>
+</span></span><span class=line><span class=cl><span class=nt>&#34;Microsoft.VSTS.Scheduling.CompletedWork&#34;</span><span class=p>:</span><span class=mf>20222.0</span><span class=p>,</span>
+</span></span><span class=line><span class=cl><span class=nt>&#34;System.Description&#34;</span><span class=p>:</span><span class=s2>&#34;这是一个使用脚本自动创建tfs的任务&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl><span class=nt>&#34;System.Tags&#34;</span><span class=p>:</span><span class=s2>&#34;测试&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>},</span>
+</span></span><span class=line><span class=cl><span class=err>...</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>上面只列出了一部分，通过上面信息我们知道，一个工作项中，状态信息对应的字段是：System.State，指派人对应的字段是：System.AssignedTo，标题对应的字段是：System.Title等等等等。知道了这些，我们就能得心应手的使用python库操作TFS了。
+下面是对操作TFS的Work Item的一些总结，我只对一些常用功能进行了封装。（运行环境python3.6或以上）</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>  1
+</span><span class=lnt>  2
+</span><span class=lnt>  3
+</span><span class=lnt>  4
+</span><span class=lnt>  5
+</span><span class=lnt>  6
+</span><span class=lnt>  7
+</span><span class=lnt>  8
+</span><span class=lnt>  9
+</span><span class=lnt> 10
+</span><span class=lnt> 11
+</span><span class=lnt> 12
+</span><span class=lnt> 13
+</span><span class=lnt> 14
+</span><span class=lnt> 15
+</span><span class=lnt> 16
+</span><span class=lnt> 17
+</span><span class=lnt> 18
+</span><span class=lnt> 19
+</span><span class=lnt> 20
+</span><span class=lnt> 21
+</span><span class=lnt> 22
+</span><span class=lnt> 23
+</span><span class=lnt> 24
+</span><span class=lnt> 25
+</span><span class=lnt> 26
+</span><span class=lnt> 27
+</span><span class=lnt> 28
+</span><span class=lnt> 29
+</span><span class=lnt> 30
+</span><span class=lnt> 31
+</span><span class=lnt> 32
+</span><span class=lnt> 33
+</span><span class=lnt> 34
+</span><span class=lnt> 35
+</span><span class=lnt> 36
+</span><span class=lnt> 37
+</span><span class=lnt> 38
+</span><span class=lnt> 39
+</span><span class=lnt> 40
+</span><span class=lnt> 41
+</span><span class=lnt> 42
+</span><span class=lnt> 43
+</span><span class=lnt> 44
+</span><span class=lnt> 45
+</span><span class=lnt> 46
+</span><span class=lnt> 47
+</span><span class=lnt> 48
+</span><span class=lnt> 49
+</span><span class=lnt> 50
+</span><span class=lnt> 51
+</span><span class=lnt> 52
+</span><span class=lnt> 53
+</span><span class=lnt> 54
+</span><span class=lnt> 55
+</span><span class=lnt> 56
+</span><span class=lnt> 57
+</span><span class=lnt> 58
+</span><span class=lnt> 59
+</span><span class=lnt> 60
+</span><span class=lnt> 61
+</span><span class=lnt> 62
+</span><span class=lnt> 63
+</span><span class=lnt> 64
+</span><span class=lnt> 65
+</span><span class=lnt> 66
+</span><span class=lnt> 67
+</span><span class=lnt> 68
+</span><span class=lnt> 69
+</span><span class=lnt> 70
+</span><span class=lnt> 71
+</span><span class=lnt> 72
+</span><span class=lnt> 73
+</span><span class=lnt> 74
+</span><span class=lnt> 75
+</span><span class=lnt> 76
+</span><span class=lnt> 77
+</span><span class=lnt> 78
+</span><span class=lnt> 79
+</span><span class=lnt> 80
+</span><span class=lnt> 81
+</span><span class=lnt> 82
+</span><span class=lnt> 83
+</span><span class=lnt> 84
+</span><span class=lnt> 85
+</span><span class=lnt> 86
+</span><span class=lnt> 87
+</span><span class=lnt> 88
+</span><span class=lnt> 89
+</span><span class=lnt> 90
+</span><span class=lnt> 91
+</span><span class=lnt> 92
+</span><span class=lnt> 93
+</span><span class=lnt> 94
+</span><span class=lnt> 95
+</span><span class=lnt> 96
+</span><span class=lnt> 97
+</span><span class=lnt> 98
+</span><span class=lnt> 99
+</span><span class=lnt>100
+</span><span class=lnt>101
+</span><span class=lnt>102
+</span><span class=lnt>103
+</span><span class=lnt>104
+</span><span class=lnt>105
+</span><span class=lnt>106
+</span><span class=lnt>107
+</span><span class=lnt>108
+</span><span class=lnt>109
+</span><span class=lnt>110
+</span><span class=lnt>111
+</span><span class=lnt>112
+</span><span class=lnt>113
+</span><span class=lnt>114
+</span><span class=lnt>115
+</span><span class=lnt>116
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>tfs</span> <span class=kn>import</span> <span class=n>TFSAPI</span><span class=p>,</span> <span class=n>TFSClientError</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 声明在哪个项目下操作Work Item</span>
+</span></span><span class=line><span class=cl><span class=n>project</span> <span class=o>=</span> <span class=s1>&#39;XB&#39;</span>
+</span></span><span class=line><span class=cl><span class=c1># token信息</span>
+</span></span><span class=line><span class=cl><span class=n>token</span> <span class=o>=</span> <span class=s1>&#39;64ugrjrfxwweazg5yd2cn3ulwm4tuqebdxkldyctabwihpqbnmpo&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>client</span> <span class=o>=</span> <span class=n>TFSAPI</span><span class=p>(</span><span class=s1>&#39;https://tfshost.com.cn/tfs/&#39;</span><span class=p>,</span> <span class=n>project</span><span class=o>=</span><span class=n>project</span><span class=p>,</span> <span class=n>pat</span><span class=o>=</span><span class=n>token</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 获取某个work item 的信息</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>get_tfs_fields</span><span class=p>(</span><span class=n>work_id</span><span class=p>:</span> <span class=nb>int</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>    :param work_id:
+</span></span></span><span class=line><span class=cl><span class=s2>    :return:
+</span></span></span><span class=line><span class=cl><span class=s2>    &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>workitem</span> <span class=o>=</span> <span class=n>client</span><span class=o>.</span><span class=n>get_workitem</span><span class=p>(</span><span class=n>work_id</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=c1># 获取workitem id</span>
+</span></span><span class=line><span class=cl>    <span class=c1># print(workitem.data[&#39;id&#39;])</span>
+</span></span><span class=line><span class=cl>    <span class=n>field_names</span> <span class=o>=</span> <span class=n>workitem</span><span class=o>.</span><span class=n>field_names</span>
+</span></span><span class=line><span class=cl>    <span class=c1># print(workitem.revisions)</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=n>field_name</span> <span class=ow>in</span> <span class=n>field_names</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s1>&#39;</span><span class=si>{</span><span class=n>field_name</span><span class=si>}</span><span class=s1>:</span><span class=si>{</span><span class=n>workitem</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=n>field_name</span><span class=p>)</span><span class=si>}</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>create_tfs_task</span><span class=p>(</span><span class=n>fields</span><span class=p>:</span> <span class=nb>dict</span><span class=p>,</span> <span class=n>work_type</span><span class=p>:</span> <span class=nb>str</span> <span class=o>=</span> <span class=s1>&#39;Task&#39;</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>int</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>    创建一个work item
+</span></span></span><span class=line><span class=cl><span class=s2>    :param work_type: 任务类型
+</span></span></span><span class=line><span class=cl><span class=s2>    :param fields: {&#39;System.Title&#39;: &#39;自动创建任务&#39;,
+</span></span></span><span class=line><span class=cl><span class=s2>          &#39;System.Description&#39;: &#39;这是一个使用脚本自动创建tfs的任务&#39;,
+</span></span></span><span class=line><span class=cl><span class=s2>          &#39;System.AssignedTo&#39;: &#39;张三&#39;,
+</span></span></span><span class=line><span class=cl><span class=s2>          }
+</span></span></span><span class=line><span class=cl><span class=s2>    :return:
+</span></span></span><span class=line><span class=cl><span class=s2>    &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>workitem</span> <span class=o>=</span> <span class=n>client</span><span class=o>.</span><span class=n>create_workitem</span><span class=p>(</span><span class=n>work_type</span><span class=p>,</span> <span class=n>fields</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>except</span> <span class=n>TFSClientError</span> <span class=k>as</span> <span class=n>e</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s1>&#39;error:</span><span class=si>{</span><span class=n>e</span><span class=si>}</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=mi>0</span>
+</span></span><span class=line><span class=cl>    <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=c1># print(workitem.get(&#39;AssignedTo&#39;))</span>
+</span></span><span class=line><span class=cl>        <span class=c1># print(workitem.id)</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=nb>int</span><span class=p>(</span><span class=n>workitem</span><span class=o>.</span><span class=n>id</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>add_child_task</span><span class=p>(</span><span class=n>parent_id</span><span class=p>:</span> <span class=nb>int</span><span class=p>,</span> <span class=n>child_id</span><span class=p>:</span> <span class=nb>int</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>    给父任务添加子任务
+</span></span></span><span class=line><span class=cl><span class=s2>    :param parent_id: 父任务ID
+</span></span></span><span class=line><span class=cl><span class=s2>    :param child_id: 子任务ID
+</span></span></span><span class=line><span class=cl><span class=s2>    :return:
+</span></span></span><span class=line><span class=cl><span class=s2>    &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>parent_workitem</span> <span class=o>=</span> <span class=n>client</span><span class=o>.</span><span class=n>get_workitem</span><span class=p>(</span><span class=n>parent_id</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=n>child_workitem</span> <span class=o>=</span> <span class=n>client</span><span class=o>.</span><span class=n>get_workitem</span><span class=p>(</span><span class=n>child_id</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=n>parent_link_raw</span> <span class=o>=</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>            <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;rel&#34;</span><span class=p>:</span> <span class=s2>&#34;System.LinkTypes.Hierarchy-Reverse&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;url&#34;</span><span class=p>:</span> <span class=n>parent_workitem</span><span class=o>.</span><span class=n>url</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;attributes&#34;</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                    <span class=s2>&#34;isLocked&#34;</span><span class=p>:</span> <span class=kc>False</span>
+</span></span><span class=line><span class=cl>                <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>]</span>
+</span></span><span class=line><span class=cl>        <span class=n>child_workitem</span><span class=o>.</span><span class=n>add_relations_raw</span><span class=p>(</span><span class=n>relations_raw</span><span class=o>=</span><span class=n>parent_link_raw</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>except</span> <span class=n>TFSClientError</span> <span class=k>as</span> <span class=n>e</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s1>&#39;error:</span><span class=si>{</span><span class=n>e</span><span class=si>}</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=kc>False</span>
+</span></span><span class=line><span class=cl>    <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=kc>True</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>update_tfs_task</span><span class=p>(</span><span class=n>work_id</span><span class=p>:</span> <span class=nb>int</span><span class=p>,</span> <span class=n>data</span><span class=p>:</span> <span class=nb>dict</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>    更新work item 信息
+</span></span></span><span class=line><span class=cl><span class=s2>    :param work_id:
+</span></span></span><span class=line><span class=cl><span class=s2>    :param data:{&#34;System.State&#34;: &#34;进行中&#34;}
+</span></span></span><span class=line><span class=cl><span class=s2>    :return:
+</span></span></span><span class=line><span class=cl><span class=s2>    &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>workitem</span> <span class=o>=</span> <span class=n>client</span><span class=o>.</span><span class=n>get_workitem</span><span class=p>(</span><span class=n>work_id</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=c1># workitem[&#39;System.State&#39;] = &#34;进行中&#34;</span>
+</span></span><span class=line><span class=cl>        <span class=k>for</span> <span class=n>key</span><span class=p>,</span> <span class=n>value</span> <span class=ow>in</span> <span class=n>data</span><span class=o>.</span><span class=n>items</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>            <span class=n>workitem</span><span class=p>[</span><span class=n>key</span><span class=p>]</span> <span class=o>=</span> <span class=n>value</span>
+</span></span><span class=line><span class=cl>    <span class=k>except</span> <span class=n>TFSClientError</span> <span class=k>as</span> <span class=n>e</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s1>&#39;error:</span><span class=si>{</span><span class=n>e</span><span class=si>}</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>search_tfs_task</span><span class=p>(</span><span class=n>title</span><span class=p>:</span> <span class=nb>str</span><span class=p>,</span> <span class=n>work_type</span><span class=p>:</span> <span class=nb>str</span> <span class=o>=</span> <span class=s1>&#39;Task&#39;</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>    根据条件查询work item 信息，查询语句可根据自己需求定制，这里只是列了根据标题和任务类型查询
+</span></span></span><span class=line><span class=cl><span class=s2>    :param work_type:
+</span></span></span><span class=line><span class=cl><span class=s2>    :param title:
+</span></span></span><span class=line><span class=cl><span class=s2>    :return:
+</span></span></span><span class=line><span class=cl><span class=s2>    &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>query</span> <span class=o>=</span> <span class=sa>f</span><span class=s2>&#34;&#34;&#34;SELECT [System.Id],[System.WorkItemType]
+</span></span></span><span class=line><span class=cl><span class=s2>        FROM workitems
+</span></span></span><span class=line><span class=cl><span class=s2>        WHERE[System.WorkItemType] = &#39;</span><span class=si>{</span><span class=n>work_type</span><span class=si>}</span><span class=s2>&#39; AND [System.Title] = &#39;</span><span class=si>{</span><span class=n>title</span><span class=si>}</span><span class=s2>&#39;
+</span></span></span><span class=line><span class=cl><span class=s2>        ORDER BY[System.ChangedDate]
+</span></span></span><span class=line><span class=cl><span class=s2>        &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>wiql</span> <span class=o>=</span> <span class=n>client</span><span class=o>.</span><span class=n>run_wiql</span><span class=p>(</span><span class=n>query</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=n>ids</span> <span class=o>=</span> <span class=nb>list</span><span class=p>(</span><span class=n>wiql</span><span class=o>.</span><span class=n>workitem_ids</span><span class=p>)</span> <span class=ow>or</span> <span class=p>[]</span>
+</span></span><span class=line><span class=cl>        <span class=c1># print(f&#34;Found WI with ids={ids}&#34;)</span>
+</span></span><span class=line><span class=cl>        <span class=c1># # raw = wiql.result</span>
+</span></span><span class=line><span class=cl>        <span class=c1># workitems = wiql.workitems</span>
+</span></span><span class=line><span class=cl>        <span class=c1># print(workitems[0][&#39;Title&#39;])</span>
+</span></span><span class=line><span class=cl>    <span class=k>except</span> <span class=ne>Exception</span> <span class=k>as</span> <span class=n>e</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s1>&#39;error:</span><span class=si>{</span><span class=n>e</span><span class=si>}</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=kc>False</span>
+</span></span><span class=line><span class=cl>    <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>ids</span>
+</span></span></code></pre></td></tr></table></div></div><p>更多操作方法请查看<a href=https://devopshq.github.io/tfs/installation.html target=_blank rel="noopener noreffer">官网</a></p></div><div class=post-footer id=post-footer><div class=post-info><div class=post-info-line><div class=post-info-mod><span>更新于 2020-04-25</span></div><div class=post-info-license></div></div><div class=post-info-line><div class=post-info-md></div><div class=post-info-share><span><a href=# onclick=return!1 title="分享到 Twitter" data-sharer=twitter data-url=https://www.geekby.cn/python-tfs/ data-title="python操作TFS的Work Item" data-via=@geekby1024 data-hashtags=tfs><i class="fab fa-twitter fa-fw"></i></a><a href=# onclick=return!1 title="分享到 微博" data-sharer=weibo data-url=https://www.geekby.cn/python-tfs/ data-title="python操作TFS的Work Item" data-image=https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/python-tfs.5r4p0wc7jjo0.png data-ralateuid=u/5101801783><i class="fab fa-weibo fa-fw"></i></a></span></div></div></div><div class=post-info-more><section class=post-tags><i class="fas fa-tags fa-fw"></i>&nbsp;<a href=/tags/tfs/>tfs</a></section><section><span><a href=# onclick=window.history.back()>返回</a></span>&nbsp;|&nbsp;<span><a href=/>主页</a></span></section></div><div class=post-nav><a href=/django-datatables/ class=prev rel=prev title=Django使用DataTables插件总结><i class="fas fa-angle-left fa-fw"></i>Django使用DataTables插件总结</a>
+<a href=/docker-mongodb-replicates/ class=next rel=next title=Docker下搭建mongodb副本集>Docker下搭建mongodb副本集<i class="fas fa-angle-right fa-fw"></i></a></div></div><div id=comments><div id=waline class=comment></div><noscript>Please enable JavaScript to view the comments powered by <a href=https://waline.js.org/>Waline</a>.</noscript></div></article></div></main><footer class=footer><div class=footer-container><div class=footer-line>由 <a href=https://gohugo.io/ target=_blank rel="noopener noreffer" title="Hugo 0.110.0">Hugo</a> 强力驱动 | 主题 - <a href=https://github.com/HEIGE-PCloud/DoIt target=_blank rel="noopener noreffer" title="DoIt 0.2.10"><i class="far fa-edit fa-fw"></i> DoIt</a></div><div class=footer-line><i class="far fa-copyright fa-fw"></i><span itemprop=copyrightYear>2020 - 2023</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=https://github.com/jackbai233 target=_blank rel="noopener noreferrer">JackBai</a></span>&nbsp;|&nbsp;<span class=license><a rel="license external nofollow noopener noreffer" href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank>CC BY-NC 4.0</a></span><span class=icp-splitter>&nbsp;|&nbsp;</span><br class=icp-br><span class=icp><a href=https://beian.miit.gov.cn/ target=_blank>陕ICP备2020013535号-2</a></span></div></div></footer></div><div id=fixed-buttons><a href=#back-to-top id=back-to-top-button class=fixed-button title=回到顶部><i class="fas fa-arrow-up fa-fw"></i>
+</a><a href=# id=view-comments class=fixed-button title=查看评论><i class="fas fa-comment fa-fw"></i></a></div><div class=assets><script type=text/javascript src=/lib/autocomplete/autocomplete.min.js></script><script type=text/javascript src=/lib/fuse/fuse.min.js></script><script type=text/javascript src=/lib/lazysizes/lazysizes.min.js></script><script type=text/javascript src=/lib/topbar/topbar.min.js></script><script type=text/javascript src=/lib/pjax/pjax.min.js></script><script type=text/javascript src=/js/theme.min.js></script></div><div class=pjax-assets><script type=text/javascript src=/lib/waline/Waline.min.js></script><script type=text/javascript src=/lib/lightgallery/lightgallery.min.js></script><script type=text/javascript src=/lib/lightgallery/lg-thumbnail.min.js></script><script type=text/javascript src=/lib/lightgallery/lg-zoom.min.js></script><script type=text/javascript src=/lib/clipboard/clipboard.min.js></script><script type=text/javascript src=/lib/sharer/sharer.min.js></script><script type=text/javascript src=/lib/katex/katex.min.js></script><script type=text/javascript src=/lib/katex/auto-render.min.js></script><script type=text/javascript src=/lib/katex/copy-tex.min.js></script><script type=text/javascript src=/lib/katex/mhchem.min.js></script><script type=text/javascript>window.config={code:{copyTitle:"复制到剪贴板",maxShownLines:20},comment:{waline:{copyright:!0,dark:"body[theme='dark'], body[theme='black']",el:"#waline",emoji:["https://cdn.jsdelivr.net/gh/walinejs/emojis/weibo","https://cdn.jsdelivr.net/gh/walinejs/emojis@1.0.0/bilibili"],highlight:!0,lang:"zh-cn",login:"enable",meta:["nick","mail","link"],pageSize:10,serverURL:"https://geekby-comment-gof863phj-jackbai233.vercel.app/",visitor:!0}},lightGallery:{actualSize:!1,exThumbImage:"data-thumbnail",hideBarsDelay:2e3,selector:".lightgallery",speed:400,thumbContHeight:80,thumbWidth:80,thumbnail:!0},math:{delimiters:[{display:!0,left:"$$",right:"$$"},{display:!0,left:"\\[",right:"\\]"},{display:!1,left:"$",right:"$"},{display:!1,left:"\\(",right:"\\)"}],strict:!1},search:{distance:100,findAllMatches:!1,fuseIndexURL:"/index.json",highlightTag:"em",ignoreFieldNorm:!1,ignoreLocation:!1,isCaseSensitive:!1,location:0,maxResultLength:10,minMatchCharLength:2,noResultsFound:"没有找到结果",snippetLength:50,threshold:.3,type:"fuse",useExtendedSearch:!1},sharerjs:!0}</script><link rel=stylesheet href=/lib/lightgallery/lightgallery.min.css><link rel=stylesheet href=/lib/katex/katex.min.css><link rel=stylesheet href=/lib/katex/copy-tex.min.css></div></body></html>

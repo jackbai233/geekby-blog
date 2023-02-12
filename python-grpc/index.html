@@ -1,0 +1,332 @@
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="noodp"><title class=pjax-title>基于grpc的流式方式实现双向通讯(python) - geekbyの自留地</title><meta name=Description content="这篇文章介绍了使用grpc实现双向通讯的方法."><meta property="og:title" content="基于grpc的流式方式实现双向通讯(python)"><meta property="og:description" content="这篇文章介绍了使用grpc实现双向通讯的方法."><meta property="og:type" content="article"><meta property="og:url" content="https://www.geekby.cn/python-grpc/"><meta property="og:image" content="https://www.geekby.cn/images/avatar.png"><meta property="article:section" content="posts"><meta property="article:published_time" content="2019-12-07T16:39:30+08:00"><meta property="article:modified_time" content="2019-12-07T16:39:30+08:00"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://www.geekby.cn/images/avatar.png"><meta name=twitter:title content="基于grpc的流式方式实现双向通讯(python)"><meta name=twitter:description content="这篇文章介绍了使用grpc实现双向通讯的方法."><meta name=application-name content="geekby"><meta name=apple-mobile-web-app-title content="geekby"><meta name=theme-color content="#f8f8f8"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=canonical href=https://www.geekby.cn/python-grpc/><link rel=prev href=https://www.geekby.cn/django-session-cookie/><link rel=next href=https://www.geekby.cn/django-datatables/><link rel=stylesheet href=/lib/normalize/normalize.min.css><link rel=stylesheet href=/css/style.min.css><link rel=preload as=style onload='this.onload=null,this.rel="stylesheet"' href=/lib/fontawesome-free/all.min.css><noscript><link rel=stylesheet href=/lib/fontawesome-free/all.min.css></noscript><link rel=preload as=style onload='this.onload=null,this.rel="stylesheet"' href=/lib/animate/animate.min.css><noscript><link rel=stylesheet href=/lib/animate/animate.min.css></noscript><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"基于grpc的流式方式实现双向通讯(python)","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/www.geekby.cn\/python-grpc\/"},"genre":"posts","keywords":"grpc","wordcount":2872,"url":"https:\/\/www.geekby.cn\/python-grpc\/","datePublished":"2019-12-07T16:39:30+08:00","dateModified":"2019-12-07T16:39:30+08:00","publisher":{"@type":"Organization","name":""},"author":{"@type":"Person","name":"JackBai"},"description":"这篇文章介绍了使用grpc实现双向通讯的方法."}</script></head><body header-desktop=fixed header-mobile=auto><script type=text/javascript>function setTheme(e){document.body.setAttribute("theme",e)}function saveTheme(e){window.localStorage&&localStorage.setItem("theme",e)}function getMeta(e){const t=document.getElementsByTagName("meta");for(let n=0;n<t.length;n++)if(t[n].getAttribute("name")===e)return t[n];return""}if(window.localStorage&&localStorage.getItem("theme")){let e=localStorage.getItem("theme");e==="light"||e==="dark"||e==="black"?setTheme(e):setTheme(window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")}else"auto"==="light"||"auto"==="dark"||"auto"==="black"?(setTheme("auto"),saveTheme("auto")):(saveTheme("auto"),setTheme(window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"));let metaColors={light:"#f8f8f8",dark:"#252627",black:"#000000"};getMeta("theme-color").content=metaColors[document.body.getAttribute("theme")]</script><div id=back-to-top></div><div id=mask></div><div class=wrapper><header class=desktop id=header-desktop><div class=header-wrapper><div class=header-title><a href=/ title=geekbyの自留地>geekbyの自留地</a></div><div class=menu><div class=menu-inner><a class=menu-item href=/posts/>文章 </a><a class=menu-item href=/tags/>标签 </a><a class=menu-item href=/categories/>分类 </a><a class=menu-item href=/about/>关于 </a><a class=menu-item href=https://github.com/jackbai233 title=Github rel="noopener noreffer" target=_blank><i class='fab fa-github fa-fw'></i> </a><span class="menu-item delimiter"></span><span class="menu-item search" id=search-desktop>
+<input type=text placeholder=搜索文章标题或内容... id=search-input-desktop>
+<a href=# onclick=return!1 class="search-button search-toggle" id=search-toggle-desktop title=搜索><i class="fas fa-search fa-fw"></i></a>
+<a href=# onclick=return!1 class="search-button search-clear" id=search-clear-desktop title=清空><i class="fas fa-times-circle fa-fw"></i></a>
+<span class="search-button search-loading" id=search-loading-desktop><i class="fas fa-spinner fa-fw fa-spin"></i></span>
+</span><a href=# onclick=return!1 class="menu-item theme-switch" title=切换主题><i class="fas fa-adjust fa-fw"></i></a></div></div></div></header><header class=mobile id=header-mobile><div class=header-container><div class=header-wrapper><div class=header-title><a href=/ title=geekbyの自留地>geekbyの自留地</a></div><div class=menu-toggle id=menu-toggle-mobile><span></span><span></span><span></span></div></div><div class=menu id=menu-mobile><div class=search-wrapper><div class="search mobile" id=search-mobile><input type=text placeholder=搜索文章标题或内容... id=search-input-mobile>
+<a href=# onclick=return!1 class="search-button search-toggle" id=search-toggle-mobile title=搜索><i class="fas fa-search fa-fw"></i></a>
+<a href=# onclick=return!1 class="search-button search-clear" id=search-clear-mobile title=清空><i class="fas fa-times-circle fa-fw"></i></a>
+<span class="search-button search-loading" id=search-loading-mobile><i class="fas fa-spinner fa-fw fa-spin"></i></span></div><a href=# onclick=return!1 class=search-cancel id=search-cancel-mobile>取消</a></div><a class=menu-item href=/posts/ title>文章</a><a class=menu-item href=/tags/ title>标签</a><a class=menu-item href=/categories/ title>分类</a><a class=menu-item href=/about/ title>关于</a><a class=menu-item href=https://github.com/jackbai233 title=Github rel="noopener noreffer" target=_blank><i class='fab fa-github fa-fw'></i></a><a href=# onclick=return!1 class="menu-item theme-switch" title=切换主题>
+<i class="fas fa-adjust fa-fw"></i></a></div></div></header><div class="search-dropdown desktop"><div id=search-dropdown-desktop></div></div><div class="search-dropdown mobile"><div id=search-dropdown-mobile></div></div><main class=main><div class=container><div class=toc id=toc-auto><h2 class=toc-title>目录</h2><div class=toc-content id=toc-content-auto></div></div><script>document.getElementsByTagName("main")[0].setAttribute("pageStyle","normal")</script><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC","true")</script><article class="page single"><h1 class="single-title animate__animated animate__flipInX">基于grpc的流式方式实现双向通讯(python)</h1><div class=post-meta><div class=post-meta-line><span class=post-author><i class="author fas fa-user-circle fa-fw"></i><a href=https://www.geekby.cn title=Author target=_blank rel="noopener noreffer author" class=author>JackBai</a>
+</span>&nbsp;<span class=post-category>收录于 </span>&nbsp;<span class=post-category>类别 <a href=/categories/python/><i class="far fa-folder fa-fw"></i>Python</a>&nbsp;<a href=/categories/%E5%90%8E%E7%AB%AF/><i class="far fa-folder fa-fw"></i>后端</a></span></div><div class=post-meta-line><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime=2019-12-07>2019-12-07</time>&nbsp;<i class="far fa-edit fa-fw"></i>&nbsp;<time datetime=2019-12-07>2019-12-07</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 2872 字&nbsp;
+<i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 6 分钟&nbsp;<span id=/python-grpc/ class=leancloud_visitors data-flag-title=基于grpc的流式方式实现双向通讯(python)>
+<i class="far fa-eye fa-fw"></i>&nbsp;<span class=leancloud-visitors-count></span>&nbsp;次阅读
+</span>&nbsp;<span id=/python-grpc/ class=comment_count data-flag-title=基于grpc的流式方式实现双向通讯(python)>
+<i class="far fa-comments fa-fw"></i>&nbsp;<span class=waline-comment-count id=waline-comment-count></span>&nbsp;条评论
+</span>&nbsp;</div></div><div class=featured-image><img class=lazyload data-src=https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/python-grpc.55ic4zobjng0.png data-srcset="https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/python-grpc.55ic4zobjng0.png, https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/python-grpc.55ic4zobjng0.png 1.5x, https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/python-grpc.55ic4zobjng0.png 2x" data-sizes=auto alt=https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/python-grpc.55ic4zobjng0.png title=这篇文章介绍了使用grpc实现双向通讯的方法. height=auto width=auto></div><div class="details toc" id=toc-static kept><div class="details-summary toc-title"><span>目录</span>
+<span><i class="details-icon fas fa-angle-right"></i></span></div><div class="details-content toc-content" id=toc-content-static><nav id=TableOfContents><ul><li><a href=#grpc介绍>grpc介绍</a></li><li><a href=#grpc通信方式>grpc通信方式</a><ul><li><ul><li><a href=#1-客户端单次请求服务端回应一次>1. 客户端单次请求，服务端回应一次:</a></li><li><a href=#2-客户端一次请求服务端流式应答其实相当于返回给客户端多条数据>2. 客户端一次请求，服务端流式应答（其实相当于返回给客户端多条数据）</a></li><li><a href=#3-客户端流式请求服务端回应一次>3. 客户端流式请求，服务端回应一次</a></li><li><a href=#4-客户端流式请求服务端流式应答>4. 客户端流式请求，服务端流式应答</a></li></ul></li></ul></li><li><a href=#具体实现>具体实现</a></li><li><a href=#总结>总结</a></li></ul></nav></div></div><div class=content id=content><p>这篇文章介绍了通过grpc的流式通信方式实现双向通讯的方法.</p><h2 id=grpc介绍>grpc介绍</h2><p>grpc是谷歌开源的一套基于rpc实现的通讯框架(<a href=https://www.grpc.io/ target=_blank rel="noopener noreffer">官网</a>有更完整的定义)。在搞懂grpc之前，首先要弄懂rpc是什么。下面是自己理解的rpc定义，若有不对，望指出：</p><blockquote><p>rpc官方称为 <strong>远程过程调用</strong> 。我这里理解为远程函数调用，即一个本机程序调用另一个机器的程序中的某个函数。因不是同一机器调用，故需要远程访问操作。</p></blockquote><p>与远程过程调用相反的则是“近程过程调用”(🤣，自己乱起的)。其实就是实现和调用都在同一个机器的程序中。比如，学过面向对象语言的（如java）可以解释为：一个类中实现了一个方法，然后另一个程序中new了一个这个类的事例(对象)，并调用该方法。而远程过程调用则相当于一个机器中实现了一个类的方法，另一个机器new了这个类的对象，它若想要调用该方法，必须要与实现了类方法的机器进行通讯。此时我们可以称实现了类方法的机器为服务端，new了对象的机器为客户端。</p><h2 id=grpc通信方式>grpc通信方式</h2><p>grpc同http通讯一样，也是基于“请求响应”模式的一种通讯。客户端请求，服务器响应。关于grpc的更多介绍可以参考官网。下面说一下grpc的四种通信方式[见<a href=https://www.grpc.io/docs/tutorials/basic/python/ target=_blank rel="noopener noreffer">官网</a>]，根据不同业务场景，可以分为：</p><h4 id=1-客户端单次请求服务端回应一次>1. 客户端单次请求，服务端回应一次:</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-proto data-lang=proto><span class=line><span class=cl><span class=c1>// Obtains the feature at a given position.
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>rpc</span> <span class=n>GetFeature</span><span class=p>(</span><span class=n>Point</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>Feature</span><span class=p>)</span> <span class=p>{}</span><span class=err>
+</span></span></span></code></pre></td></tr></table></div></div><h4 id=2-客户端一次请求服务端流式应答其实相当于返回给客户端多条数据>2. 客户端一次请求，服务端流式应答（其实相当于返回给客户端多条数据）</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-proto data-lang=proto><span class=line><span class=cl><span class=c1>// Obtains the Features available within the given Rectangle.  Results are
+</span></span></span><span class=line><span class=cl><span class=c1>// streamed rather than returned at once (e.g. in a response message with a
+</span></span></span><span class=line><span class=cl><span class=c1>// repeated field), as the rectangle may cover a large area and contain a
+</span></span></span><span class=line><span class=cl><span class=c1>// huge number of features.
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>rpc</span> <span class=n>ListFeatures</span><span class=p>(</span><span class=n>Rectangle</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>stream</span> <span class=n>Feature</span><span class=p>)</span> <span class=p>{}</span><span class=err>
+</span></span></span></code></pre></td></tr></table></div></div><h4 id=3-客户端流式请求服务端回应一次>3. 客户端流式请求，服务端回应一次</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-proto data-lang=proto><span class=line><span class=cl><span class=c1>// Accepts a stream of Points on a route being traversed, returning a
+</span></span></span><span class=line><span class=cl><span class=c1>// RouteSummary when traversal is completed.
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>rpc</span> <span class=n>RecordRoute</span><span class=p>(</span><span class=n>stream</span> <span class=n>Point</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>RouteSummary</span><span class=p>)</span> <span class=p>{}</span><span class=err>
+</span></span></span></code></pre></td></tr></table></div></div><h4 id=4-客户端流式请求服务端流式应答>4. 客户端流式请求，服务端流式应答</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-proto data-lang=proto><span class=line><span class=cl><span class=c1>// Accepts a stream of RouteNotes sent while a route is being traversed,
+</span></span></span><span class=line><span class=cl><span class=c1>// while receiving other RouteNotes (e.g. from other users).
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>rpc</span> <span class=n>RouteChat</span><span class=p>(</span><span class=n>stream</span> <span class=n>RouteNote</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>stream</span> <span class=n>RouteNote</span><span class=p>)</span> <span class=p>{}</span><span class=err>
+</span></span></span></code></pre></td></tr></table></div></div><p>知道了四种通信方式后，回到主要问题上，我们要利用这四种通信方式来实现客户端与服务端互相通信。要实现互相通信，我这里想到的有两种：</p><ol><li>客户端与服务端各自既是客户端又是服务端
+这种方式感觉是最容易实现的。即在客户端与服务端之间各实现一套“请求响应模型”，这样客户端主动通信服务端时是正常请求响应，服务端主动通信客户端时它此时就变为客户端来请求。这样在外部看来两个机器之间就能互相通信了。
+该种实现方式建立了两个通道来通信。缺点是要实现两套通信代码。</li><li>客户端与服务端直接互相通信
+我们已经知道grpc是基于请求响应的，客户端请求，服务端响应。那怎么让服务端主动请求客户端通信呢？ 其实我们可以用grpc的 <strong>第2或第4种的服务端流式响应</strong> 。原理是可以让客户端先发一个空消息给服务端让服务端知道（相当于客户端在服务端注册），然后服务端流式回应。因流式回应不会一下子都回完，我们可以在中途把服务端要发给客户端的消息加入到流中，让流把消息捎回到客户端。
+在外部来看客户端与服务端能互相通信了。不过这种缺点是把互相通信的业务都糅杂到一块了。</li></ol><h2 id=具体实现>具体实现</h2><p>上面说了两种互相通信的实现方法及grpc的四种通信方式。这里采用第二种实现方法及grpc的第二种通信方式来实现，编程语言采用Python实现。
+grpc采用protobuf来定义和传输数据。故通信的数据是用proto文件来定义的。关于proto的语法可以参考<a href=https://www.cnblogs.com/dwxt/p/8694872.html target=_blank rel="noopener noreffer">文档</a>
+首先建立如下的目录：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>│  contact_client.py
+</span></span><span class=line><span class=cl>│  contact_server.py
+</span></span><span class=line><span class=cl>|
+</span></span><span class=line><span class=cl>├─contact
+</span></span><span class=line><span class=cl>│  │  contact.proto
+</span></span><span class=line><span class=cl>│  │ 
+</span></span><span class=line><span class=cl>│  │  __init__.py
+</span></span><span class=line><span class=cl>│  
+</span></span></code></pre></td></tr></table></div></div><p>contact.proto：定义通信的数据部分
+contact_client.py：客户端代码
+contact_server.py：服务端代码</p><p>contact.proto内容如下：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-protobuf data-lang=protobuf><span class=line><span class=cl><span class=n>syntax</span> <span class=o>=</span> <span class=s>&#34;proto3&#34;</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c1>// 定义一个服务
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>service</span> <span class=n>Contact</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span>    <span class=c1>// 客户端通信给服务端，通信方式可以随意选择，这里我选择第4种通信方式
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>rpc</span> <span class=n>sendStatus</span> <span class=p>(</span><span class=n>stream</span> <span class=n>ClientMsg</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>stream</span> <span class=n>Result</span><span class=p>);</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span>    <span class=c1>// 客户端发送一个空消息给服务端，服务端就能给客户端通信了
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>rpc</span> <span class=n>getTask</span> <span class=p>(</span><span class=n>Empty</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>stream</span> <span class=n>ServerMsg</span><span class=p>);</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span>    <span class=c1>// 客户端接受完服务端消息处理完后，再告诉服务端。这个tellResult也可以不要，看具体需求
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>rpc</span> <span class=n>tellResult</span> <span class=p>(</span><span class=n>stream</span> <span class=n>Result</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>Empty</span><span class=p>);</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=kd>message</span> <span class=nc>ClientMsg</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span>    <span class=kt>string</span> <span class=n>msg</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=kd>message</span> <span class=nc>ServerMsg</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span>    <span class=kt>string</span> <span class=n>task</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=kd>message</span> <span class=nc>Empty</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=kd>message</span> <span class=nc>Result</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span>    <span class=kt>string</span> <span class=n>ret</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=p>}</span><span class=err>
+</span></span></span></code></pre></td></tr></table></div></div><p>在contact文件夹下运行命令：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>python -m grpc_tools.protoc -I. --python_out<span class=o>=</span>. --grpc_python_out<span class=o>=</span>. contact.proto
+</span></span></code></pre></td></tr></table></div></div><p>会在contact目录下自动生成contact_pb2.py和contact_pb2_grpc.py两个文件。下来就是实现具体的通信了，首先是客户端向服务端发消息：
+contact_server.py中代码实现具体代码：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl>    <span class=c1># 注意服务端的具体实现函数是在类里面</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>sendStatus</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>request_iterator</span><span class=p>,</span> <span class=n>context</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>for</span> <span class=n>note</span> <span class=ow>in</span> <span class=n>request_iterator</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=k>yield</span> <span class=n>contact_pb2</span><span class=o>.</span><span class=n>Result</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>                <span class=n>result</span><span class=o>=</span><span class=sa>f</span><span class=s2>&#34;服务端接收到消息:</span><span class=si>{</span><span class=n>note</span><span class=o>.</span><span class=n>msg</span><span class=si>}</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>            <span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>contact_client.py中的代码为：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># 先制造一些客户端能发送的数据</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>make_some_data</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=n>i</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=mi>15</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=n>num</span> <span class=o>=</span> <span class=n>random</span><span class=o>.</span><span class=n>randint</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span> <span class=mi>20</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>yield</span> <span class=n>contact_pb2</span><span class=o>.</span><span class=n>ClientMsg</span><span class=p>(</span><span class=n>msg</span><span class=o>=</span><span class=sa>f</span><span class=s2>&#34;数据:</span><span class=si>{</span><span class=n>num</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>send_status</span><span class=p>(</span><span class=n>stub</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>while</span> <span class=kc>True</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>status_response</span> <span class=o>=</span> <span class=n>stub</span><span class=o>.</span><span class=n>sendStatus</span><span class=p>(</span><span class=n>make_some_data</span><span class=p>())</span>
+</span></span><span class=line><span class=cl>            <span class=k>for</span> <span class=n>ret</span> <span class=ow>in</span> <span class=n>status_response</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                <span class=nb>print</span><span class=p>(</span><span class=n>ret</span><span class=o>.</span><span class=n>result</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=n>time</span><span class=o>.</span><span class=n>sleep</span><span class=p>(</span><span class=mi>60</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>except</span> <span class=ne>Exception</span> <span class=k>as</span> <span class=n>e</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s1>&#39;err in send_status:</span><span class=si>{</span><span class=n>e</span><span class=si>}</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span>
+</span></span></code></pre></td></tr></table></div></div><p>上面的代码就实现了客户端主动通信服务端的功能。可以看到是服务端先实现具体的代码，然后客护端调用具体函数与服务端通信，最后再对服务端返回的数据进行处理。
+而服务端主动通信客户端的方式可以理解为：客户端先给服务端发送一个消息，告诉服务端我在线，然后服务端就能发数据给客户端了，最后客户端再通知服务端我接收了你的哪些数据。具体代码为：
+server端代码：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>import</span> <span class=nn>logging</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>random</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>time</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>concurrent</span> <span class=kn>import</span> <span class=n>futures</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>grpc</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>contact</span> <span class=kn>import</span> <span class=n>contact_pb2_grpc</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>contact</span> <span class=kn>import</span> <span class=n>contact_pb2</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 在类初试化的时候定义了一个列表self.tasks来充当任务队列</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>getTask</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>request_iterator</span><span class=p>,</span> <span class=n>context</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=nb>print</span><span class=p>(</span><span class=s2>&#34;服务端已接收到客户端上线通知，开始发送任务给客户端</span><span class=se>\n</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>last_index</span> <span class=o>=</span> <span class=mi>0</span>
+</span></span><span class=line><span class=cl>    <span class=k>while</span> <span class=kc>True</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=s2>&#34;服务端开始发送任务给客户端了。。。。。。</span><span class=se>\n</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>while</span> <span class=nb>len</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>tasks</span><span class=p>)</span> <span class=o>&gt;</span> <span class=n>last_index</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>n</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>tasks</span><span class=p>[</span><span class=n>last_index</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>            <span class=n>last_index</span> <span class=o>+=</span> <span class=mi>1</span>
+</span></span><span class=line><span class=cl>            <span class=k>yield</span> <span class=n>n</span>
+</span></span><span class=line><span class=cl>            <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s1>&#39;服务端发送给了客户端任务：</span><span class=si>{</span><span class=n>n</span><span class=o>.</span><span class=n>task</span><span class=si>}</span><span class=s1>##########</span><span class=se>\n</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            
+</span></span><span class=line><span class=cl>       <span class=c1># 顺便制造些服务端的任务数据用来填充到任务队列里面</span>
+</span></span><span class=line><span class=cl>        <span class=k>for</span> <span class=n>i</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=mi>10</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>            <span class=n>num</span> <span class=o>=</span> <span class=n>random</span><span class=o>.</span><span class=n>randint</span><span class=p>(</span><span class=mi>100</span><span class=p>,</span> <span class=mi>200</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=bp>self</span><span class=o>.</span><span class=n>tasks</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>contact_pb2</span><span class=o>.</span><span class=n>ServerMsg</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>                <span class=n>task</span><span class=o>=</span><span class=sa>f</span><span class=s2>&#34;任务:</span><span class=si>{</span><span class=n>num</span><span class=si>}</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>            <span class=p>))</span>
+</span></span><span class=line><span class=cl>        <span class=n>time</span><span class=o>.</span><span class=n>sleep</span><span class=p>(</span><span class=mi>40</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>tellResult</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>request_iterator</span><span class=p>,</span> <span class=n>context</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=n>response</span> <span class=ow>in</span> <span class=n>request_iterator</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;我已经知道客户端接收到我发过去的任务:</span><span class=si>{</span><span class=n>response</span><span class=o>.</span><span class=n>ret</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>contact_pb2</span><span class=o>.</span><span class=n>Empty</span><span class=p>()</span>
+</span></span></code></pre></td></tr></table></div></div><p>client端代码</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>import</span> <span class=nn>logging</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>random</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>threading</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>time</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>grpc</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>contact</span> <span class=kn>import</span> <span class=n>contact_pb2</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>contact</span> <span class=kn>import</span> <span class=n>contact_pb2_grpc</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 接收服务端发送过来的任务</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>get_task</span><span class=p>(</span><span class=n>stub</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>for</span> <span class=n>task</span> <span class=ow>in</span> <span class=n>stub</span><span class=o>.</span><span class=n>getTask</span><span class=p>(</span><span class=n>contact_pb2</span><span class=o>.</span><span class=n>Empty</span><span class=p>()):</span>
+</span></span><span class=line><span class=cl>            <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;客户端已接收到服务端任务：</span><span class=si>{</span><span class=n>task</span><span class=o>.</span><span class=n>task</span><span class=si>}</span><span class=se>\n</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=c1># 顺便再告诉服务端我已经接收到你发的任务，你不用担心我没接收到它</span>
+</span></span><span class=line><span class=cl>            <span class=k>yield</span> <span class=n>contact_pb2</span><span class=o>.</span><span class=n>Result</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>                <span class=n>ret</span><span class=o>=</span><span class=sa>f</span><span class=s2>&#34;客户端接收到任务:</span><span class=si>{</span><span class=n>task</span><span class=o>.</span><span class=n>task</span><span class=si>}</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>            <span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>except</span> <span class=ne>Exception</span> <span class=k>as</span> <span class=n>e</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s1>&#39;err:</span><span class=si>{</span><span class=n>e</span><span class=si>}</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl><span class=c1># 客户端再通知服务端我接收到你的消息了</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>tell_result</span><span class=p>(</span><span class=n>stub</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>   <span class=n>result</span> <span class=o>=</span> <span class=n>get_task</span><span class=p>(</span><span class=n>stub</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>stub</span><span class=o>.</span><span class=n>tellResult</span><span class=p>(</span><span class=n>result</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>run</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>    <span class=k>with</span> <span class=n>grpc</span><span class=o>.</span><span class=n>insecure_channel</span><span class=p>(</span><span class=s1>&#39;localhost:50051&#39;</span><span class=p>)</span> <span class=k>as</span> <span class=n>channel</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>stub</span> <span class=o>=</span> <span class=n>contact_pb2_grpc</span><span class=o>.</span><span class=n>ContactStub</span><span class=p>(</span><span class=n>channel</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>while</span> <span class=kc>True</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                <span class=n>threading</span><span class=o>.</span><span class=n>Thread</span><span class=p>(</span><span class=n>target</span><span class=o>=</span><span class=n>send_status</span><span class=p>,</span> <span class=n>args</span><span class=o>=</span><span class=p>(</span><span class=n>stub</span><span class=p>,),</span> <span class=n>daemon</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span><span class=o>.</span><span class=n>start</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>                <span class=n>tell_result</span><span class=p>(</span><span class=n>stub</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=k>except</span> <span class=n>grpc</span><span class=o>.</span><span class=n>RpcError</span> <span class=k>as</span> <span class=n>e</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;server connected out, please retry:</span><span class=si>{</span><span class=n>e</span><span class=o>.</span><span class=n>code</span><span class=p>()</span><span class=si>}</span><span class=s2>,</span><span class=si>{</span><span class=n>e</span><span class=o>.</span><span class=n>details</span><span class=p>()</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=k>except</span> <span class=ne>Exception</span> <span class=k>as</span> <span class=n>e</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s1>&#39;unknown err:</span><span class=si>{</span><span class=n>e</span><span class=si>}</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=k>finally</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                <span class=n>time</span><span class=o>.</span><span class=n>sleep</span><span class=p>(</span><span class=mi>2</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=vm>__name__</span> <span class=o>==</span> <span class=s1>&#39;__main__&#39;</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>run</span><span class=p>()</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=总结>总结</h2><p>从上面看出，服务端主动通信给客户端，还是逃不过grpc的请求响应方式。上面代码只是实现了一种互相通信的方法，但是没有既充当客户端又充当服务端那种方法简单。</p></div><div class=post-footer id=post-footer><div class=post-info><div class=post-info-line><div class=post-info-mod><span>更新于 2019-12-07</span></div><div class=post-info-license></div></div><div class=post-info-line><div class=post-info-md></div><div class=post-info-share><span><a href=# onclick=return!1 title="分享到 Twitter" data-sharer=twitter data-url=https://www.geekby.cn/python-grpc/ data-title=基于grpc的流式方式实现双向通讯(python) data-via=@geekby1024 data-hashtags=grpc><i class="fab fa-twitter fa-fw"></i></a><a href=# onclick=return!1 title="分享到 微博" data-sharer=weibo data-url=https://www.geekby.cn/python-grpc/ data-title=基于grpc的流式方式实现双向通讯(python) data-image=https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/python-grpc.55ic4zobjng0.png data-ralateuid=u/5101801783><i class="fab fa-weibo fa-fw"></i></a></span></div></div></div><div class=post-info-more><section class=post-tags><i class="fas fa-tags fa-fw"></i>&nbsp;<a href=/tags/grpc/>grpc</a></section><section><span><a href=# onclick=window.history.back()>返回</a></span>&nbsp;|&nbsp;<span><a href=/>主页</a></span></section></div><div class=post-nav><a href=/django-session-cookie/ class=prev rel=prev title="Django 用Session和Cookie分别实现记住用户登录状态"><i class="fas fa-angle-left fa-fw"></i>Django 用Session和Cookie分别实现记住用户登录状态</a>
+<a href=/django-datatables/ class=next rel=next title=Django使用DataTables插件总结>Django使用DataTables插件总结<i class="fas fa-angle-right fa-fw"></i></a></div></div><div id=comments><div id=waline class=comment></div><noscript>Please enable JavaScript to view the comments powered by <a href=https://waline.js.org/>Waline</a>.</noscript></div></article></div></main><footer class=footer><div class=footer-container><div class=footer-line>由 <a href=https://gohugo.io/ target=_blank rel="noopener noreffer" title="Hugo 0.110.0">Hugo</a> 强力驱动 | 主题 - <a href=https://github.com/HEIGE-PCloud/DoIt target=_blank rel="noopener noreffer" title="DoIt 0.2.10"><i class="far fa-edit fa-fw"></i> DoIt</a></div><div class=footer-line><i class="far fa-copyright fa-fw"></i><span itemprop=copyrightYear>2020 - 2023</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=https://github.com/jackbai233 target=_blank rel="noopener noreferrer">JackBai</a></span>&nbsp;|&nbsp;<span class=license><a rel="license external nofollow noopener noreffer" href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank>CC BY-NC 4.0</a></span><span class=icp-splitter>&nbsp;|&nbsp;</span><br class=icp-br><span class=icp><a href=https://beian.miit.gov.cn/ target=_blank>陕ICP备2020013535号-2</a></span></div></div></footer></div><div id=fixed-buttons><a href=#back-to-top id=back-to-top-button class=fixed-button title=回到顶部><i class="fas fa-arrow-up fa-fw"></i>
+</a><a href=# id=view-comments class=fixed-button title=查看评论><i class="fas fa-comment fa-fw"></i></a></div><div class=assets><script type=text/javascript src=/lib/autocomplete/autocomplete.min.js></script><script type=text/javascript src=/lib/fuse/fuse.min.js></script><script type=text/javascript src=/lib/lazysizes/lazysizes.min.js></script><script type=text/javascript src=/lib/topbar/topbar.min.js></script><script type=text/javascript src=/lib/pjax/pjax.min.js></script><script type=text/javascript src=/js/theme.min.js></script></div><div class=pjax-assets><script type=text/javascript src=/lib/waline/Waline.min.js></script><script type=text/javascript src=/lib/lightgallery/lightgallery.min.js></script><script type=text/javascript src=/lib/lightgallery/lg-thumbnail.min.js></script><script type=text/javascript src=/lib/lightgallery/lg-zoom.min.js></script><script type=text/javascript src=/lib/clipboard/clipboard.min.js></script><script type=text/javascript src=/lib/sharer/sharer.min.js></script><script type=text/javascript src=/lib/katex/katex.min.js></script><script type=text/javascript src=/lib/katex/auto-render.min.js></script><script type=text/javascript src=/lib/katex/copy-tex.min.js></script><script type=text/javascript src=/lib/katex/mhchem.min.js></script><script type=text/javascript>window.config={code:{copyTitle:"复制到剪贴板",maxShownLines:20},comment:{waline:{copyright:!0,dark:"body[theme='dark'], body[theme='black']",el:"#waline",emoji:["https://cdn.jsdelivr.net/gh/walinejs/emojis/weibo","https://cdn.jsdelivr.net/gh/walinejs/emojis@1.0.0/bilibili"],highlight:!0,lang:"zh-cn",login:"enable",meta:["nick","mail","link"],pageSize:10,serverURL:"https://geekby-comment-gof863phj-jackbai233.vercel.app/",visitor:!0}},lightGallery:{actualSize:!1,exThumbImage:"data-thumbnail",hideBarsDelay:2e3,selector:".lightgallery",speed:400,thumbContHeight:80,thumbWidth:80,thumbnail:!0},math:{delimiters:[{display:!0,left:"$$",right:"$$"},{display:!0,left:"\\[",right:"\\]"},{display:!1,left:"$",right:"$"},{display:!1,left:"\\(",right:"\\)"}],strict:!1},search:{distance:100,findAllMatches:!1,fuseIndexURL:"/index.json",highlightTag:"em",ignoreFieldNorm:!1,ignoreLocation:!1,isCaseSensitive:!1,location:0,maxResultLength:10,minMatchCharLength:2,noResultsFound:"没有找到结果",snippetLength:50,threshold:.3,type:"fuse",useExtendedSearch:!1},sharerjs:!0}</script><link rel=stylesheet href=/lib/lightgallery/lightgallery.min.css><link rel=stylesheet href=/lib/katex/katex.min.css><link rel=stylesheet href=/lib/katex/copy-tex.min.css></div></body></html>

@@ -1,0 +1,635 @@
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="noodp"><title class=pjax-title>[转]Go语言实现SSH远程终端及WebSocket - geekbyの自留地</title><meta name=Description content="这篇文章介绍了使用golang实现ssh远程终端."><meta property="og:title" content="[转]Go语言实现SSH远程终端及WebSocket"><meta property="og:description" content="这篇文章介绍了使用golang实现ssh远程终端."><meta property="og:type" content="article"><meta property="og:url" content="https://www.geekby.cn/golang-ssh-websocket/"><meta property="og:image" content="https://www.geekby.cn/images/avatar.png"><meta property="article:section" content="posts"><meta property="article:published_time" content="2021-10-24T17:02:53+08:00"><meta property="article:modified_time" content="2021-10-24T17:02:53+08:00"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://www.geekby.cn/images/avatar.png"><meta name=twitter:title content="[转]Go语言实现SSH远程终端及WebSocket"><meta name=twitter:description content="这篇文章介绍了使用golang实现ssh远程终端."><meta name=application-name content="geekby"><meta name=apple-mobile-web-app-title content="geekby"><meta name=theme-color content="#f8f8f8"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=canonical href=https://www.geekby.cn/golang-ssh-websocket/><link rel=prev href=https://www.geekby.cn/consul-watch-golang/><link rel=next href=https://www.geekby.cn/mysql-ha/><link rel=stylesheet href=/lib/normalize/normalize.min.css><link rel=stylesheet href=/css/style.min.css><link rel=preload as=style onload='this.onload=null,this.rel="stylesheet"' href=/lib/fontawesome-free/all.min.css><noscript><link rel=stylesheet href=/lib/fontawesome-free/all.min.css></noscript><link rel=preload as=style onload='this.onload=null,this.rel="stylesheet"' href=/lib/animate/animate.min.css><noscript><link rel=stylesheet href=/lib/animate/animate.min.css></noscript><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"[转]Go语言实现SSH远程终端及WebSocket","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/www.geekby.cn\/golang-ssh-websocket\/"},"genre":"posts","keywords":"Golang, WebSocket","wordcount":4021,"url":"https:\/\/www.geekby.cn\/golang-ssh-websocket\/","datePublished":"2021-10-24T17:02:53+08:00","dateModified":"2021-10-24T17:02:53+08:00","publisher":{"@type":"Organization","name":""},"author":{"@type":"Person","name":"JackBai"},"description":"这篇文章介绍了使用golang实现ssh远程终端."}</script></head><body header-desktop=fixed header-mobile=auto><script type=text/javascript>function setTheme(e){document.body.setAttribute("theme",e)}function saveTheme(e){window.localStorage&&localStorage.setItem("theme",e)}function getMeta(e){const t=document.getElementsByTagName("meta");for(let n=0;n<t.length;n++)if(t[n].getAttribute("name")===e)return t[n];return""}if(window.localStorage&&localStorage.getItem("theme")){let e=localStorage.getItem("theme");e==="light"||e==="dark"||e==="black"?setTheme(e):setTheme(window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")}else"auto"==="light"||"auto"==="dark"||"auto"==="black"?(setTheme("auto"),saveTheme("auto")):(saveTheme("auto"),setTheme(window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"));let metaColors={light:"#f8f8f8",dark:"#252627",black:"#000000"};getMeta("theme-color").content=metaColors[document.body.getAttribute("theme")]</script><div id=back-to-top></div><div id=mask></div><div class=wrapper><header class=desktop id=header-desktop><div class=header-wrapper><div class=header-title><a href=/ title=geekbyの自留地>geekbyの自留地</a></div><div class=menu><div class=menu-inner><a class=menu-item href=/posts/>文章 </a><a class=menu-item href=/tags/>标签 </a><a class=menu-item href=/categories/>分类 </a><a class=menu-item href=/about/>关于 </a><a class=menu-item href=https://github.com/jackbai233 title=Github rel="noopener noreffer" target=_blank><i class='fab fa-github fa-fw'></i> </a><span class="menu-item delimiter"></span><span class="menu-item search" id=search-desktop>
+<input type=text placeholder=搜索文章标题或内容... id=search-input-desktop>
+<a href=# onclick=return!1 class="search-button search-toggle" id=search-toggle-desktop title=搜索><i class="fas fa-search fa-fw"></i></a>
+<a href=# onclick=return!1 class="search-button search-clear" id=search-clear-desktop title=清空><i class="fas fa-times-circle fa-fw"></i></a>
+<span class="search-button search-loading" id=search-loading-desktop><i class="fas fa-spinner fa-fw fa-spin"></i></span>
+</span><a href=# onclick=return!1 class="menu-item theme-switch" title=切换主题><i class="fas fa-adjust fa-fw"></i></a></div></div></div></header><header class=mobile id=header-mobile><div class=header-container><div class=header-wrapper><div class=header-title><a href=/ title=geekbyの自留地>geekbyの自留地</a></div><div class=menu-toggle id=menu-toggle-mobile><span></span><span></span><span></span></div></div><div class=menu id=menu-mobile><div class=search-wrapper><div class="search mobile" id=search-mobile><input type=text placeholder=搜索文章标题或内容... id=search-input-mobile>
+<a href=# onclick=return!1 class="search-button search-toggle" id=search-toggle-mobile title=搜索><i class="fas fa-search fa-fw"></i></a>
+<a href=# onclick=return!1 class="search-button search-clear" id=search-clear-mobile title=清空><i class="fas fa-times-circle fa-fw"></i></a>
+<span class="search-button search-loading" id=search-loading-mobile><i class="fas fa-spinner fa-fw fa-spin"></i></span></div><a href=# onclick=return!1 class=search-cancel id=search-cancel-mobile>取消</a></div><a class=menu-item href=/posts/ title>文章</a><a class=menu-item href=/tags/ title>标签</a><a class=menu-item href=/categories/ title>分类</a><a class=menu-item href=/about/ title>关于</a><a class=menu-item href=https://github.com/jackbai233 title=Github rel="noopener noreffer" target=_blank><i class='fab fa-github fa-fw'></i></a><a href=# onclick=return!1 class="menu-item theme-switch" title=切换主题>
+<i class="fas fa-adjust fa-fw"></i></a></div></div></header><div class="search-dropdown desktop"><div id=search-dropdown-desktop></div></div><div class="search-dropdown mobile"><div id=search-dropdown-mobile></div></div><main class=main><div class=container><div class=toc id=toc-auto><h2 class=toc-title>目录</h2><div class=toc-content id=toc-content-auto></div></div><script>document.getElementsByTagName("main")[0].setAttribute("pageStyle","normal")</script><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC","true")</script><article class="page single"><h1 class="single-title animate__animated animate__flipInX">[转]Go语言实现SSH远程终端及WebSocket</h1><div class=post-meta><div class=post-meta-line><span class=post-author><i class="author fas fa-user-circle fa-fw"></i><a href=https://www.geekby.cn title=Author target=_blank rel="noopener noreffer author" class=author>JackBai</a>
+</span>&nbsp;<span class=post-category>收录于 </span>&nbsp;<span class=post-category>类别 <a href=/categories/%E5%90%8E%E7%AB%AF/><i class="far fa-folder fa-fw"></i>后端</a></span></div><div class=post-meta-line><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime=2021-10-24>2021-10-24</time>&nbsp;<i class="far fa-edit fa-fw"></i>&nbsp;<time datetime=2021-10-24>2021-10-24</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 4021 字&nbsp;
+<i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 9 分钟&nbsp;<span id=/golang-ssh-websocket/ class=leancloud_visitors data-flag-title=[转]Go语言实现SSH远程终端及WebSocket>
+<i class="far fa-eye fa-fw"></i>&nbsp;<span class=leancloud-visitors-count></span>&nbsp;次阅读
+</span>&nbsp;<span id=/golang-ssh-websocket/ class=comment_count data-flag-title=[转]Go语言实现SSH远程终端及WebSocket>
+<i class="far fa-comments fa-fw"></i>&nbsp;<span class=waline-comment-count id=waline-comment-count></span>&nbsp;条评论
+</span>&nbsp;</div></div><div class=featured-image><img class=lazyload data-src=https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/golang-ssh.2jel1ppf5va0.png data-srcset="https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/golang-ssh.2jel1ppf5va0.png, https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/golang-ssh.2jel1ppf5va0.png 1.5x, https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/golang-ssh.2jel1ppf5va0.png 2x" data-sizes=auto alt=https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/golang-ssh.2jel1ppf5va0.png title=这篇文章介绍了使用golang实现ssh远程终端. height=auto width=auto></div><div class="details toc" id=toc-static kept><div class="details-summary toc-title"><span>目录</span>
+<span><i class="details-icon fas fa-angle-right"></i></span></div><div class="details-content toc-content" id=toc-content-static><nav id=TableOfContents><ul><li><a href=#使用>使用</a><ul><li><a href=#下载>下载</a></li><li><a href=#使用密码认证连接>使用密码认证连接</a></li></ul></li><li><a href=#websocket简介>WebSocket简介</a><ul><li><a href=#优点>优点</a></li></ul></li><li><a href=#基于web的terminal终端控制台>基于web的Terminal终端控制台</a><ul><li><a href=#实现流程>实现流程</a></li><li><a href=#升级http协议为websocket>升级HTTP协议为WebSocket</a></li><li><a href=#升级协议并获得socket连接>升级协议并获得socket连接</a></li><li><a href=#后台拿到主机信息建立ssh客户端>后台拿到主机信息，建立ssh客户端</a></li><li><a href=#通过ssh客户端创建ssh-channel并请求pty终端请求用户默认会话>通过ssh客户端创建ssh channel，并请求pty终端，请求用户默认会话</a></li><li><a href=#远程主机与浏览器实时数据交换>远程主机与浏览器实时数据交换</a></li><li><a href=#前端>前端</a></li></ul></li><li><a href=#参考>参考</a></li></ul></nav></div></div><div class=content id=content><p>本文主要介绍了使用golang结合webSocket通信原理来实现远程ssh终端的方法.</p><div class="details admonition tip open"><div class="details-summary admonition-title"><i class="icon fas fa-lightbulb fa-fw"></i>声明<i class="details-icon fas fa-angle-right fa-fw"></i></div><div class=details-content><div class=admonition-content>本文转载至<a href=https://www.cnblogs.com/you-men/p/13934845.html target=_blank rel="noopener noreffer">https://www.cnblogs.com/you-men/p/13934845.html</a></div></div></div><h2 id=使用>使用</h2><h3 id=下载>下载</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>go get <span class=s2>&#34;github.com/mitchellh/go-homedir&#34;</span>
+</span></span><span class=line><span class=cl> go get <span class=s2>&#34;golang.org/x/crypto/ssh&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=使用密码认证连接>使用密码认证连接</h3><p>连接包含了认证,可以使用password或者sshkey 两种方式认证,下面采用密码认证方式完成连接</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span><span class=lnt>69
+</span><span class=lnt>70
+</span><span class=lnt>71
+</span><span class=lnt>72
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kn>package</span> <span class=nx>main</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl>	<span class=s>&#34;fmt&#34;</span>
+</span></span><span class=line><span class=cl>	<span class=s>&#34;golang.org/x/crypto/ssh&#34;</span>
+</span></span><span class=line><span class=cl>	<span class=s>&#34;log&#34;</span>
+</span></span><span class=line><span class=cl>	<span class=s>&#34;time&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>main</span><span class=p>()</span>  <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=nx>sshHost</span> <span class=o>:=</span> <span class=s>&#34;39.108.140.0&#34;</span>
+</span></span><span class=line><span class=cl>	<span class=nx>sshUser</span> <span class=o>:=</span> <span class=s>&#34;root&#34;</span>
+</span></span><span class=line><span class=cl>	<span class=nx>sshPasswrod</span> <span class=o>:=</span> <span class=s>&#34;youmen&#34;</span>
+</span></span><span class=line><span class=cl>	<span class=nx>sshType</span> <span class=o>:=</span> <span class=s>&#34;password&#34;</span>  <span class=c1>// password或者key
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=c1>//sshKeyPath := &#34;&#34; // ssh id_rsa.id路径
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=nx>sshPort</span> <span class=o>:=</span> <span class=mi>22</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=c1>// 创建ssh登录配置
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=nx>config</span> <span class=o>:=</span> <span class=o>&amp;</span><span class=nx>ssh</span><span class=p>.</span><span class=nx>ClientConfig</span><span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=nx>Timeout</span><span class=p>:</span> <span class=nx>time</span><span class=p>.</span><span class=nx>Second</span><span class=p>,</span> <span class=c1>// ssh连接time out时间一秒钟,如果ssh验证错误会在一秒钟返回
+</span></span></span><span class=line><span class=cl><span class=c1></span>		<span class=nx>User</span><span class=p>:</span> <span class=nx>sshUser</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>		<span class=nx>HostKeyCallback</span><span class=p>:</span> <span class=nx>ssh</span><span class=p>.</span><span class=nf>InsecureIgnoreHostKey</span><span class=p>(),</span>  <span class=c1>// 这个可以,但是不够安全
+</span></span></span><span class=line><span class=cl><span class=c1></span>		<span class=c1>//HostKeyCallback: hostKeyCallBackFunc(h.Host),
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>sshType</span> <span class=o>==</span> <span class=s>&#34;password&#34;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=nx>config</span><span class=p>.</span><span class=nx>Auth</span> <span class=p>=</span> <span class=p>[]</span><span class=nx>ssh</span><span class=p>.</span><span class=nx>AuthMethod</span><span class=p>{</span><span class=nx>ssh</span><span class=p>.</span><span class=nf>Password</span><span class=p>(</span><span class=nx>sshPasswrod</span><span class=p>)}</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=c1>//config.Auth = []ssh.AuthMethod(publicKeyAuthFunc(sshKeyPath))
+</span></span></span><span class=line><span class=cl><span class=c1></span>		<span class=k>return</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=c1>// dial 获取ssh client
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=nx>addr</span> <span class=o>:=</span> <span class=nx>fmt</span><span class=p>.</span><span class=nf>Sprintf</span><span class=p>(</span><span class=s>&#34;%s:%d&#34;</span><span class=p>,</span><span class=nx>sshHost</span><span class=p>,</span><span class=nx>sshPort</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=nx>sshClient</span><span class=p>,</span><span class=nx>err</span> <span class=o>:=</span> <span class=nx>ssh</span><span class=p>.</span><span class=nf>Dial</span><span class=p>(</span><span class=s>&#34;tcp&#34;</span><span class=p>,</span><span class=nx>addr</span><span class=p>,</span><span class=nx>config</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=nx>log</span><span class=p>.</span><span class=nf>Fatal</span><span class=p>(</span><span class=s>&#34;创建ssh client 失败&#34;</span><span class=p>,</span><span class=nx>err</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=k>defer</span> <span class=nx>sshClient</span><span class=p>.</span><span class=nf>Close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=c1>// 创建ssh-session
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=nx>session</span><span class=p>,</span><span class=nx>err</span> <span class=o>:=</span> <span class=nx>sshClient</span><span class=p>.</span><span class=nf>NewSession</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=nx>log</span><span class=p>.</span><span class=nf>Fatal</span><span class=p>(</span><span class=s>&#34;创建ssh session失败&#34;</span><span class=p>,</span><span class=nx>err</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=k>defer</span> <span class=nx>session</span><span class=p>.</span><span class=nf>Close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=c1>// 执行远程命令
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=nx>combo</span><span class=p>,</span><span class=nx>err</span> <span class=o>:=</span> <span class=nx>session</span><span class=p>.</span><span class=nf>CombinedOutput</span><span class=p>(</span><span class=s>&#34;whoami; cd /; ls -al;&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=nx>log</span><span class=p>.</span><span class=nf>Fatal</span><span class=p>(</span><span class=s>&#34;远程执行cmd失败&#34;</span><span class=p>,</span><span class=nx>err</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=nx>log</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=s>&#34;命令输出:&#34;</span><span class=p>,</span><span class=nb>string</span><span class=p>(</span><span class=nx>combo</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>//func publicKeyAuthFunc(kPath string) ssh.AuthMethod  {
+</span></span></span><span class=line><span class=cl><span class=c1>//	keyPath ,err := homedir.Expand(kPath)
+</span></span></span><span class=line><span class=cl><span class=c1>//	if err != nil {
+</span></span></span><span class=line><span class=cl><span class=c1>//		log.Fatal(&#34;find key&#39;s home dir failed&#34;,err)
+</span></span></span><span class=line><span class=cl><span class=c1>//	}
+</span></span></span><span class=line><span class=cl><span class=c1>//
+</span></span></span><span class=line><span class=cl><span class=c1>//	key,err := ioutil.ReadFile(keyPath)
+</span></span></span><span class=line><span class=cl><span class=c1>//	if err != nil {
+</span></span></span><span class=line><span class=cl><span class=c1>//		log.Fatal(&#34;ssh key file read failed&#34;,err)
+</span></span></span><span class=line><span class=cl><span class=c1>//	}
+</span></span></span><span class=line><span class=cl><span class=c1>//
+</span></span></span><span class=line><span class=cl><span class=c1>//	signer,err := ssh.ParsePrivateKey(key)
+</span></span></span><span class=line><span class=cl><span class=c1>//	if err != nil {
+</span></span></span><span class=line><span class=cl><span class=c1>//		log.Fatal(&#34;ssh key signer failed&#34;,err)
+</span></span></span><span class=line><span class=cl><span class=c1>//	}
+</span></span></span><span class=line><span class=cl><span class=c1>//	return ssh.PublicKeys(signer)
+</span></span></span><span class=line><span class=cl><span class=c1>//}
+</span></span></span></code></pre></td></tr></table></div></div><p>代码解读：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=c1>// 配置ssh.ClientConfig
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=cm>/*
+</span></span></span><span class=line><span class=cl><span class=cm>		建议TimeOut自定义一个比较端的时间
+</span></span></span><span class=line><span class=cl><span class=cm>		自定义HostKeyCallback如果像简便就使用ssh.InsecureIgnoreHostKey会带哦,这种方式不是很安全
+</span></span></span><span class=line><span class=cl><span class=cm>		publicKeyAuthFunc 如果使用key登录就需要用哪个这个函数量读取id_rsa私钥, 当然也可以自定义这个访问让他支持字符串.
+</span></span></span><span class=line><span class=cl><span class=cm>*/</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// ssh.Dial创建ssh客户端
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=cm>/*
+</span></span></span><span class=line><span class=cl><span class=cm>		拼接字符串得到ssh链接地址,同时不要忘记defer client.Close()
+</span></span></span><span class=line><span class=cl><span class=cm>*/</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// sshClient.NewSession创建会话
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=cm>/*
+</span></span></span><span class=line><span class=cl><span class=cm>		可以自定义stdin,stdout
+</span></span></span><span class=line><span class=cl><span class=cm>		可以创建pty
+</span></span></span><span class=line><span class=cl><span class=cm>		可以SetEnv
+</span></span></span><span class=line><span class=cl><span class=cm>*/</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// 执行命令CombinnedOutput run...
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>go</span> <span class=nx>run</span> <span class=nx>main</span><span class=p>.</span><span class=k>go</span>
+</span></span><span class=line><span class=cl><span class=mi>2020</span><span class=o>/</span><span class=mi>11</span><span class=o>/</span><span class=mo>06</span> <span class=mo>00</span><span class=p>:</span><span class=mo>07</span><span class=p>:</span><span class=mi>31</span> <span class=err>命令输出</span><span class=p>:</span> <span class=nx>root</span>
+</span></span><span class=line><span class=cl><span class=nx>total</span> <span class=mi>84</span>
+</span></span><span class=line><span class=cl><span class=nx>dr</span><span class=o>-</span><span class=nx>xr</span><span class=o>-</span><span class=nx>xr</span><span class=o>-</span><span class=nx>x</span><span class=p>.</span> <span class=mi>20</span> <span class=nx>root</span>  <span class=nx>root</span>   <span class=mi>4096</span> <span class=nx>Sep</span> <span class=mi>28</span> <span class=mi>09</span><span class=p>:</span><span class=mi>38</span> <span class=p>.</span>
+</span></span><span class=line><span class=cl><span class=nx>dr</span><span class=o>-</span><span class=nx>xr</span><span class=o>-</span><span class=nx>xr</span><span class=o>-</span><span class=nx>x</span><span class=p>.</span> <span class=mi>20</span> <span class=nx>root</span>  <span class=nx>root</span>   <span class=mi>4096</span> <span class=nx>Sep</span> <span class=mi>28</span> <span class=mi>09</span><span class=p>:</span><span class=mi>38</span> <span class=p>..</span>
+</span></span><span class=line><span class=cl><span class=o>-</span><span class=nx>rw</span><span class=o>-</span><span class=nx>r</span><span class=o>--</span><span class=nx>r</span><span class=o>--</span>   <span class=mi>1</span> <span class=nx>root</span>  <span class=nx>root</span>      <span class=mi>0</span> <span class=nx>Aug</span> <span class=mi>18</span>  <span class=mi>2017</span> <span class=p>.</span><span class=nx>autorelabel</span>
+</span></span><span class=line><span class=cl><span class=nx>lrwxrwxrwx</span><span class=p>.</span>  <span class=mi>1</span> <span class=nx>root</span>  <span class=nx>root</span>      <span class=mi>7</span> <span class=nx>Aug</span> <span class=mi>18</span>  <span class=mi>2017</span> <span class=nx>bin</span> <span class=o>-</span><span class=p>&gt;</span> <span class=nx>usr</span><span class=o>/</span><span class=nx>bin</span>
+</span></span><span class=line><span class=cl><span class=nx>dr</span><span class=o>-</span><span class=nx>xr</span><span class=o>-</span><span class=nx>xr</span><span class=o>-</span><span class=nx>x</span><span class=p>.</span>  <span class=mi>4</span> <span class=nx>root</span>  <span class=nx>root</span>   <span class=mi>4096</span> <span class=nx>Sep</span> <span class=mi>12</span>  <span class=mi>2017</span> <span class=nx>boot</span>
+</span></span><span class=line><span class=cl><span class=nx>drwxrwxr</span><span class=o>-</span><span class=nx>x</span>   <span class=mi>2</span> <span class=nx>rsync</span> <span class=nx>rsync</span>  <span class=mi>4096</span> <span class=nx>Jul</span> <span class=mi>29</span> <span class=mi>23</span><span class=p>:</span><span class=mi>37</span> <span class=nx>data</span>
+</span></span><span class=line><span class=cl><span class=nx>drwxr</span><span class=o>-</span><span class=nx>xr</span><span class=o>-</span><span class=nx>x</span>  <span class=mi>19</span> <span class=nx>root</span>  <span class=nx>root</span>   <span class=mi>2980</span> <span class=nx>Jul</span> <span class=mi>28</span> <span class=mi>13</span><span class=p>:</span><span class=mi>29</span> <span class=nx>dev</span>
+</span></span><span class=line><span class=cl><span class=nx>drwxr</span><span class=o>-</span><span class=nx>xr</span><span class=o>-</span><span class=nx>x</span><span class=p>.</span> <span class=mi>95</span> <span class=nx>root</span>  <span class=nx>root</span>  <span class=mi>12288</span> <span class=nx>Nov</span>  <span class=mi>5</span> <span class=mi>23</span><span class=p>:</span><span class=mi>46</span> <span class=nx>etc</span>
+</span></span><span class=line><span class=cl><span class=nx>drwxr</span><span class=o>-</span><span class=nx>xr</span><span class=o>-</span><span class=nx>x</span><span class=p>.</span>  <span class=mi>5</span> <span class=nx>root</span>  <span class=nx>root</span>   <span class=mi>4096</span> <span class=nx>Nov</span>  <span class=mi>3</span> <span class=mi>16</span><span class=p>:</span><span class=mi>11</span> <span class=nx>home</span>
+</span></span><span class=line><span class=cl><span class=nx>lrwxrwxrwx</span><span class=p>.</span>  <span class=mi>1</span> <span class=nx>root</span>  <span class=nx>root</span>      <span class=mi>7</span> <span class=nx>Aug</span> <span class=mi>18</span>  <span class=mi>2017</span> <span class=nx>lib</span> <span class=o>-</span><span class=p>&gt;</span> <span class=nx>usr</span><span class=o>/</span><span class=nx>lib</span>
+</span></span><span class=line><span class=cl><span class=nx>lrwxrwxrwx</span><span class=p>.</span>  <span class=mi>1</span> <span class=nx>root</span>  <span class=nx>root</span>      <span class=mi>9</span> <span class=nx>Aug</span> <span class=mi>18</span>  <span class=mi>2017</span> <span class=nx>lib64</span> <span class=o>-</span><span class=p>&gt;</span> <span class=nx>usr</span><span class=o>/</span><span class=nx>lib64</span>
+</span></span><span class=line><span class=cl><span class=nx>drwx</span><span class=o>------</span><span class=p>.</span>  <span class=mi>2</span> <span class=nx>root</span>  <span class=nx>root</span>  <span class=mi>16384</span> <span class=nx>Aug</span> <span class=mi>18</span>  <span class=mi>2017</span> <span class=nx>lost</span><span class=o>+</span><span class=nx>found</span>
+</span></span><span class=line><span class=cl><span class=nx>drwxr</span><span class=o>-</span><span class=nx>xr</span><span class=o>-</span><span class=nx>x</span><span class=p>.</span>  <span class=mi>2</span> <span class=nx>root</span>  <span class=nx>root</span>   <span class=mi>4096</span> <span class=nx>Nov</span>  <span class=mi>5</span>  <span class=mi>2016</span> <span class=nx>media</span>
+</span></span><span class=line><span class=cl><span class=nx>drwxr</span><span class=o>-</span><span class=nx>xr</span><span class=o>-</span><span class=nx>x</span><span class=p>.</span>  <span class=mi>3</span> <span class=nx>root</span>  <span class=nx>root</span>   <span class=mi>4096</span> <span class=nx>Jul</span> <span class=mi>28</span> <span class=mi>21</span><span class=p>:</span><span class=mo>01</span> <span class=nx>mnt</span>
+</span></span><span class=line><span class=cl><span class=nx>drwxr</span><span class=o>-</span><span class=nx>xr</span><span class=o>-</span><span class=nx>x</span>   <span class=mi>4</span> <span class=nx>root</span>  <span class=nx>root</span>   <span class=mi>4096</span> <span class=nx>Sep</span> <span class=mi>28</span> <span class=mi>09</span><span class=p>:</span><span class=mi>38</span> <span class=nx>nginx_test</span>
+</span></span><span class=line><span class=cl><span class=nx>drwxr</span><span class=o>-</span><span class=nx>xr</span><span class=o>-</span><span class=nx>x</span><span class=p>.</span>  <span class=mi>8</span> <span class=nx>root</span>  <span class=nx>root</span>   <span class=mi>4096</span> <span class=nx>Nov</span>  <span class=mi>3</span> <span class=mi>16</span><span class=p>:</span><span class=mi>10</span> <span class=nx>opt</span>
+</span></span><span class=line><span class=cl><span class=nx>dr</span><span class=o>-</span><span class=nx>xr</span><span class=o>-</span><span class=nx>xr</span><span class=o>-</span><span class=nx>x</span>  <span class=mi>87</span> <span class=nx>root</span>  <span class=nx>root</span>      <span class=mi>0</span> <span class=nx>Jul</span> <span class=mi>28</span> <span class=mi>13</span><span class=p>:</span><span class=mi>26</span> <span class=nx>proc</span>
+</span></span><span class=line><span class=cl><span class=nx>dr</span><span class=o>-</span><span class=nx>xr</span><span class=o>-</span><span class=nx>x</span><span class=o>---</span><span class=p>.</span> <span class=mi>18</span> <span class=nx>root</span>  <span class=nx>root</span>   <span class=mi>4096</span> <span class=nx>Nov</span>  <span class=mi>4</span> <span class=mo>00</span><span class=p>:</span><span class=mi>38</span> <span class=nx>root</span>
+</span></span><span class=line><span class=cl><span class=nx>drwxr</span><span class=o>-</span><span class=nx>xr</span><span class=o>-</span><span class=nx>x</span>  <span class=mi>27</span> <span class=nx>root</span>  <span class=nx>root</span>    <span class=mi>860</span> <span class=nx>Nov</span>  <span class=mi>4</span> <span class=mi>21</span><span class=p>:</span><span class=mi>57</span> <span class=nx>run</span>
+</span></span><span class=line><span class=cl><span class=nx>lrwxrwxrwx</span><span class=p>.</span>  <span class=mi>1</span> <span class=nx>root</span>  <span class=nx>root</span>      <span class=mi>8</span> <span class=nx>Aug</span> <span class=mi>18</span>  <span class=mi>2017</span> <span class=nx>sbin</span> <span class=o>-</span><span class=p>&gt;</span> <span class=nx>usr</span><span class=o>/</span><span class=nx>sbin</span>
+</span></span><span class=line><span class=cl><span class=nx>drwxr</span><span class=o>-</span><span class=nx>xr</span><span class=o>-</span><span class=nx>x</span><span class=p>.</span>  <span class=mi>2</span> <span class=nx>root</span>  <span class=nx>root</span>   <span class=mi>4096</span> <span class=nx>Nov</span>  <span class=mi>5</span>  <span class=mi>2016</span> <span class=nx>srv</span>
+</span></span><span class=line><span class=cl><span class=nx>dr</span><span class=o>-</span><span class=nx>xr</span><span class=o>-</span><span class=nx>xr</span><span class=o>-</span><span class=nx>x</span>  <span class=mi>13</span> <span class=nx>root</span>  <span class=nx>root</span>      <span class=mi>0</span> <span class=nx>Jul</span> <span class=mi>28</span> <span class=mi>21</span><span class=p>:</span><span class=mi>26</span> <span class=nx>sys</span>
+</span></span><span class=line><span class=cl><span class=nx>drwxrwxrwt</span><span class=p>.</span>  <span class=mi>8</span> <span class=nx>root</span>  <span class=nx>root</span>   <span class=mi>4096</span> <span class=nx>Nov</span>  <span class=mi>5</span> <span class=mo>03</span><span class=p>:</span><span class=mi>09</span> <span class=nx>tmp</span>
+</span></span><span class=line><span class=cl><span class=nx>drwxr</span><span class=o>-</span><span class=nx>xr</span><span class=o>-</span><span class=nx>x</span><span class=p>.</span> <span class=mi>13</span> <span class=nx>root</span>  <span class=nx>root</span>   <span class=mi>4096</span> <span class=nx>Aug</span> <span class=mi>18</span>  <span class=mi>2017</span> <span class=nx>usr</span>
+</span></span><span class=line><span class=cl><span class=nx>drwxr</span><span class=o>-</span><span class=nx>xr</span><span class=o>-</span><span class=nx>x</span><span class=p>.</span> <span class=mi>21</span> <span class=nx>root</span>  <span class=nx>root</span>   <span class=mi>4096</span> <span class=nx>Nov</span>  <span class=mi>3</span> <span class=mi>16</span><span class=p>:</span><span class=mi>10</span> <span class=kd>var</span>
+</span></span></code></pre></td></tr></table></div></div><p>以上内容摘自：<a href=https://mojotv.cn/2019/05/22/golang-ssh-session target=_blank rel="noopener noreffer">https://mojotv.cn/2019/05/22/golang-ssh-session</a></p><h2 id=websocket简介>WebSocket简介</h2><p>HTML5开始提供的一种浏览器与服务器进行双工通讯的网络技术,属于应用层协议,它基于TCP传输协议,并复用HTTP的握手通道:</p><p>对大部分web开发者来说,上面描述有点枯燥,只需要几下以下三点</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>/*
+</span></span><span class=line><span class=cl>		1. WebSocket可以在浏览器里使用
+</span></span><span class=line><span class=cl>		2. 支持双向通信
+</span></span><span class=line><span class=cl>		3. 使用很简单
+</span></span><span class=line><span class=cl>*/
+</span></span></code></pre></td></tr></table></div></div><h3 id=优点>优点</h3><p>对比HTTP协议的话,概括的说就是: 支持双向通信,更灵活,更高效,可扩展性更好</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>/*
+</span></span><span class=line><span class=cl>		1. 支持双向通信,实时性更强
+</span></span><span class=line><span class=cl>		2. 更好的二进制支持
+</span></span><span class=line><span class=cl>		3. 较少的控制开销,连接创建后,客户端和服务端进行数据交换时,协议控制的数据包头部较小,在不包含头部的情况下,
+</span></span><span class=line><span class=cl>				服务端到客户端的包头只有2-10字节(取决于数据包长度), 客户端到服务端的话,需要加上额外4字节的掩码,
+</span></span><span class=line><span class=cl>				而HTTP每次同年高新都需要携带完整的头部
+</span></span><span class=line><span class=cl>		4. 支持扩展,ws协议定义了扩展, 用户可以扩展协议, 或者实现自定义的子协议
+</span></span><span class=line><span class=cl>*/
+</span></span></code></pre></td></tr></table></div></div><h2 id=基于web的terminal终端控制台>基于web的Terminal终端控制台</h2><p>完成这样一个Web Terminal的目的主要是解决几个问题:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>/*
+</span></span><span class=line><span class=cl>		1. 一定程度上取代xshell，secureRT，putty等ssh终端
+</span></span><span class=line><span class=cl>		2. 可以方便身份认证, 访问控制
+</span></span><span class=line><span class=cl>		3. 方便使用, 不受电脑环境的影响
+</span></span><span class=line><span class=cl>*/
+</span></span></code></pre></td></tr></table></div></div><p>要实现远程登录的功能,其数据流向大概为</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>/*
+</span></span><span class=line><span class=cl>		浏览器 &lt;--&gt;  WebSocket  &lt;---&gt; SSH &lt;---&gt; Linux OS
+</span></span><span class=line><span class=cl>*/
+</span></span></code></pre></td></tr></table></div></div><h3 id=实现流程>实现流程</h3><ul><li><ol><li>浏览器将主机的信息(ip, 用户名, 密码, 请求的终端大小等)进行加密, 传给后台, 并通过HTTP请求与后台协商升级协议. 协议升级完成后, 后续的数据交换则遵照web Socket的协议.</li></ol></li><li><ol start=2><li>后台将HTTP请求升级为web Socket协议, 得到一个和浏览器数据交换的连接通道</li></ol></li><li><ol start=3><li>后台将数据进行解密拿到主机信息, 创建一个SSH 客户端, 与远程主机的SSH 服务端协商加密, 互相认证, 然后建立一个SSH Channel</li></ol></li><li><ol start=4><li>后台和远程主机有了通讯的信道, 然后后台将终端的大小等信息通过SSH Channel请求远程主机创建一个 pty(伪终端), 并请求启动当前用户的默认 shell</li></ol></li><li><ol start=5><li>后台通过 Socket连接通道拿到用户输入, 再通过SSH Channel将输入传给pty, pty将这些数据交给远程主机处理后按照前面指定的终端标准输出到SSH Channel中, 同时键盘输入也会发送给SSH Channel</li></ol></li><li><ol start=6><li>后台从SSH Channel中拿到按照终端大小的标准输出后又通过Socket连接将输出返回给浏览器, 由此变实现了Web Terminal</li></ol></li></ul><p><img class=lazyload data-src=https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/image.2qsqdsa5h4o0.png data-srcset="https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/image.2qsqdsa5h4o0.png, https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/image.2qsqdsa5h4o0.png 1.5x, https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/image.2qsqdsa5h4o0.png 2x" data-sizes=auto alt=https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/image.2qsqdsa5h4o0.png title=image></p><p><img class=lazyload data-src=https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/image.54fxpcesfi00.png data-srcset="https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/image.54fxpcesfi00.png, https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/image.54fxpcesfi00.png 1.5x, https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/image.54fxpcesfi00.png 2x" data-sizes=auto alt=https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/image.54fxpcesfi00.png title=image></p><p>按照上面的使用流程基于代码解释如何实现</p><h3 id=升级http协议为websocket>升级HTTP协议为WebSocket</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kd>var</span> <span class=nx>upgrader</span> <span class=p>=</span> <span class=nx>websocket</span><span class=p>.</span><span class=nx>Upgrader</span><span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=nx>ReadBufferSize</span><span class=p>:</span>  <span class=mi>1024</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>	<span class=nx>WriteBufferSize</span><span class=p>:</span> <span class=mi>1024</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>	<span class=nx>CheckOrigin</span><span class=p>:</span> <span class=kd>func</span><span class=p>(</span><span class=nx>r</span> <span class=o>*</span><span class=nx>http</span><span class=p>.</span><span class=nx>Request</span><span class=p>)</span> <span class=kt>bool</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=kc>true</span>
+</span></span><span class=line><span class=cl>	<span class=p>},</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=升级协议并获得socket连接>升级协议并获得socket连接</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=nx>conn</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>upgrader</span><span class=p>.</span><span class=nf>Upgrade</span><span class=p>(</span><span class=nx>c</span><span class=p>.</span><span class=nx>Writer</span><span class=p>,</span> <span class=nx>c</span><span class=p>.</span><span class=nx>Request</span><span class=p>,</span> <span class=kc>nil</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>c</span><span class=p>.</span><span class=nf>Error</span><span class=p>(</span><span class=nx>err</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>conn就是socket连接通道, 接下来后台和浏览器之间的通讯都将基于这个通道</p><h3 id=后台拿到主机信息建立ssh客户端>后台拿到主机信息，建立ssh客户端</h3><p>ssh客户端结构体</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kd>type</span> <span class=nx>SSHClient</span> <span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=nx>Username</span>  <span class=kt>string</span> <span class=s>`json:&#34;username&#34;`</span>
+</span></span><span class=line><span class=cl>	<span class=nx>Password</span>  <span class=kt>string</span> <span class=s>`json:&#34;password&#34;`</span>
+</span></span><span class=line><span class=cl>	<span class=nx>IpAddress</span> <span class=kt>string</span> <span class=s>`json:&#34;ipaddress&#34;`</span>
+</span></span><span class=line><span class=cl>	<span class=nx>Port</span>      <span class=kt>int</span>    <span class=s>`json:&#34;port&#34;`</span>
+</span></span><span class=line><span class=cl>	<span class=nx>Session</span>   <span class=o>*</span><span class=nx>ssh</span><span class=p>.</span><span class=nx>Session</span>
+</span></span><span class=line><span class=cl>	<span class=nx>Client</span>    <span class=o>*</span><span class=nx>ssh</span><span class=p>.</span><span class=nx>Client</span>
+</span></span><span class=line><span class=cl>	<span class=nx>channel</span>   <span class=nx>ssh</span><span class=p>.</span><span class=nx>Channel</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>//创建新的ssh客户端时, 默认用户名为root, 端口为22
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>func</span> <span class=nf>NewSSHClient</span><span class=p>()</span> <span class=nx>SSHClient</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=nx>client</span> <span class=o>:=</span> <span class=nx>SSHClient</span><span class=p>{}</span>
+</span></span><span class=line><span class=cl>	<span class=nx>client</span><span class=p>.</span><span class=nx>Username</span> <span class=p>=</span> <span class=s>&#34;root&#34;</span>
+</span></span><span class=line><span class=cl>	<span class=nx>client</span><span class=p>.</span><span class=nx>Port</span> <span class=p>=</span> <span class=mi>22</span>
+</span></span><span class=line><span class=cl>	<span class=k>return</span> <span class=nx>client</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>初始化的时候我们只有主机的信息, 而Session, client, channel都是空的, 现在先生成真正的client:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>this</span> <span class=o>*</span><span class=nx>SSHClient</span><span class=p>)</span> <span class=nf>GenerateClient</span><span class=p>()</span> <span class=kt>error</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=kd>var</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl>		<span class=nx>auth</span>         <span class=p>[]</span><span class=nx>ssh</span><span class=p>.</span><span class=nx>AuthMethod</span>
+</span></span><span class=line><span class=cl>		<span class=nx>addr</span>         <span class=kt>string</span>
+</span></span><span class=line><span class=cl>		<span class=nx>clientConfig</span> <span class=o>*</span><span class=nx>ssh</span><span class=p>.</span><span class=nx>ClientConfig</span>
+</span></span><span class=line><span class=cl>		<span class=nx>client</span>       <span class=o>*</span><span class=nx>ssh</span><span class=p>.</span><span class=nx>Client</span>
+</span></span><span class=line><span class=cl>		<span class=nx>config</span>       <span class=nx>ssh</span><span class=p>.</span><span class=nx>Config</span>
+</span></span><span class=line><span class=cl>		<span class=nx>err</span>          <span class=kt>error</span>
+</span></span><span class=line><span class=cl>	<span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=nx>auth</span> <span class=p>=</span> <span class=nb>make</span><span class=p>([]</span><span class=nx>ssh</span><span class=p>.</span><span class=nx>AuthMethod</span><span class=p>,</span> <span class=mi>0</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=nx>auth</span> <span class=p>=</span> <span class=nb>append</span><span class=p>(</span><span class=nx>auth</span><span class=p>,</span> <span class=nx>ssh</span><span class=p>.</span><span class=nf>Password</span><span class=p>(</span><span class=nx>this</span><span class=p>.</span><span class=nx>Password</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>	<span class=nx>config</span> <span class=p>=</span> <span class=nx>ssh</span><span class=p>.</span><span class=nx>Config</span><span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=nx>Ciphers</span><span class=p>:</span> <span class=p>[]</span><span class=kt>string</span><span class=p>{</span><span class=s>&#34;aes128-ctr&#34;</span><span class=p>,</span> <span class=s>&#34;aes192-ctr&#34;</span><span class=p>,</span> <span class=s>&#34;aes256-ctr&#34;</span><span class=p>,</span> <span class=s>&#34;aes128-gcm@openssh.com&#34;</span><span class=p>,</span> <span class=s>&#34;arcfour256&#34;</span><span class=p>,</span> <span class=s>&#34;arcfour128&#34;</span><span class=p>,</span> <span class=s>&#34;aes128-cbc&#34;</span><span class=p>,</span> <span class=s>&#34;3des-cbc&#34;</span><span class=p>,</span> <span class=s>&#34;aes192-cbc&#34;</span><span class=p>,</span> <span class=s>&#34;aes256-cbc&#34;</span><span class=p>},</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=nx>clientConfig</span> <span class=p>=</span> <span class=o>&amp;</span><span class=nx>ssh</span><span class=p>.</span><span class=nx>ClientConfig</span><span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=nx>User</span><span class=p>:</span>    <span class=nx>this</span><span class=p>.</span><span class=nx>Username</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>		<span class=nx>Auth</span><span class=p>:</span>    <span class=nx>auth</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>		<span class=nx>Timeout</span><span class=p>:</span> <span class=mi>5</span> <span class=o>*</span> <span class=nx>time</span><span class=p>.</span><span class=nx>Second</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>		<span class=nx>Config</span><span class=p>:</span>  <span class=nx>config</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>		<span class=nx>HostKeyCallback</span><span class=p>:</span> <span class=kd>func</span><span class=p>(</span><span class=nx>hostname</span> <span class=kt>string</span><span class=p>,</span> <span class=nx>remote</span> <span class=nx>net</span><span class=p>.</span><span class=nx>Addr</span><span class=p>,</span> <span class=nx>key</span> <span class=nx>ssh</span><span class=p>.</span><span class=nx>PublicKey</span><span class=p>)</span> <span class=kt>error</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>			<span class=k>return</span> <span class=kc>nil</span>
+</span></span><span class=line><span class=cl>		<span class=p>},</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=nx>addr</span> <span class=p>=</span> <span class=nx>fmt</span><span class=p>.</span><span class=nf>Sprintf</span><span class=p>(</span><span class=s>&#34;%s:%d&#34;</span><span class=p>,</span> <span class=nx>this</span><span class=p>.</span><span class=nx>IpAddress</span><span class=p>,</span> <span class=nx>this</span><span class=p>.</span><span class=nx>Port</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>client</span><span class=p>,</span> <span class=nx>err</span> <span class=p>=</span> <span class=nx>ssh</span><span class=p>.</span><span class=nf>Dial</span><span class=p>(</span><span class=s>&#34;tcp&#34;</span><span class=p>,</span> <span class=nx>addr</span><span class=p>,</span> <span class=nx>clientConfig</span><span class=p>);</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=nx>err</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=nx>this</span><span class=p>.</span><span class=nx>Client</span> <span class=p>=</span> <span class=nx>client</span>
+</span></span><span class=line><span class=cl>	<span class=k>return</span> <span class=kc>nil</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>ssh.Dial(“tcp”, addr, clientConfig)创建连接并返回客户端, 如果主机信息不对或其它问题这里将直接失败</p><h3 id=通过ssh客户端创建ssh-channel并请求pty终端请求用户默认会话>通过ssh客户端创建ssh channel，并请求pty终端，请求用户默认会话</h3><p>如果主机信息验证通过, 可以通过ssh client创建一个通道:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=nx>channel</span><span class=p>,</span> <span class=nx>inRequests</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>this</span><span class=p>.</span><span class=nx>Client</span><span class=p>.</span><span class=nf>OpenChannel</span><span class=p>(</span><span class=s>&#34;session&#34;</span><span class=p>,</span> <span class=kc>nil</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>log</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=nx>err</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=kc>nil</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=nx>this</span><span class=p>.</span><span class=nx>channel</span> <span class=p>=</span> <span class=nx>channel</span>
+</span></span></code></pre></td></tr></table></div></div><p>ssh通道创建完成后, 请求一个标准输出的终端, 并开启用户的默认shell:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=nx>ok</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>channel</span><span class=p>.</span><span class=nf>SendRequest</span><span class=p>(</span><span class=s>&#34;pty-req&#34;</span><span class=p>,</span> <span class=kc>true</span><span class=p>,</span> <span class=nx>ssh</span><span class=p>.</span><span class=nf>Marshal</span><span class=p>(</span><span class=o>&amp;</span><span class=nx>req</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=p>!</span><span class=nx>ok</span> <span class=o>||</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>log</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=nx>err</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=kc>nil</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=nx>ok</span><span class=p>,</span> <span class=nx>err</span> <span class=p>=</span> <span class=nx>channel</span><span class=p>.</span><span class=nf>SendRequest</span><span class=p>(</span><span class=s>&#34;shell&#34;</span><span class=p>,</span> <span class=kc>true</span><span class=p>,</span> <span class=kc>nil</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=p>!</span><span class=nx>ok</span> <span class=o>||</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>log</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=nx>err</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=kc>nil</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=远程主机与浏览器实时数据交换>远程主机与浏览器实时数据交换</h3><p>现在为止建立了两个通道, 一个是websocket, 一个是ssh channel, 后台将起两个主要的协程, 一个不停的从websocket通道里读取用户的输入, 并通过ssh channel传给远程主机:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=c1>//这里第一个协程获取用户的输入
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>go</span> <span class=kd>func</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// p为用户输入
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nx>_</span><span class=p>,</span> <span class=nx>p</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>ws</span><span class=p>.</span><span class=nf>ReadMessage</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=nx>_</span><span class=p>,</span> <span class=nx>err</span> <span class=p>=</span> <span class=nx>this</span><span class=p>.</span><span class=nx>channel</span><span class=p>.</span><span class=nf>Write</span><span class=p>(</span><span class=nx>p</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}()</span>
+</span></span></code></pre></td></tr></table></div></div><p>第二个主协程将远程主机的数据传递给浏览器, 在这个协程里还将起一个协程, 不断获取ssh channel里的数据并传给后台内部创建的一个通道, 主协程则有一个死循环, 每隔一段时间从内部通道里读取数据, 并将其通过websocket传给浏览器, 所以数据传输并不是真正实时的,而是有一个间隔在, 我写的默认为100微秒, 这样基本感受不到延迟, 而且减少了消耗, 有时浏览器输入一个命令获取大量数据时, 会感觉数据出现会一顿一顿的便是因为设置了一个间隔:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=c1>//第二个协程将远程主机的返回结果返回给用户
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>go</span> <span class=kd>func</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>br</span> <span class=o>:=</span> <span class=nx>bufio</span><span class=p>.</span><span class=nf>NewReader</span><span class=p>(</span><span class=nx>this</span><span class=p>.</span><span class=nx>channel</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=nx>buf</span> <span class=o>:=</span> <span class=p>[]</span><span class=kt>byte</span><span class=p>{}</span>
+</span></span><span class=line><span class=cl>    <span class=nx>t</span> <span class=o>:=</span> <span class=nx>time</span><span class=p>.</span><span class=nf>NewTimer</span><span class=p>(</span><span class=nx>time</span><span class=p>.</span><span class=nx>Microsecond</span> <span class=o>*</span> <span class=mi>100</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>defer</span> <span class=nx>t</span><span class=p>.</span><span class=nf>Stop</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 构建一个信道, 一端将数据远程主机的数据写入, 一段读取数据写入ws
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=nx>r</span> <span class=o>:=</span> <span class=nb>make</span><span class=p>(</span><span class=kd>chan</span> <span class=kt>rune</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// 另起一个协程, 一个死循环不断的读取ssh channel的数据, 并传给r信道直到连接断开
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>go</span> <span class=kd>func</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>defer</span> <span class=nx>this</span><span class=p>.</span><span class=nx>Client</span><span class=p>.</span><span class=nf>Close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        <span class=k>defer</span> <span class=nx>this</span><span class=p>.</span><span class=nx>Session</span><span class=p>.</span><span class=nf>Close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=k>for</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nx>x</span><span class=p>,</span> <span class=nx>size</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>br</span><span class=p>.</span><span class=nf>ReadRune</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=nx>log</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=nx>err</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>                <span class=nx>ws</span><span class=p>.</span><span class=nf>WriteMessage</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span> <span class=p>[]</span><span class=nb>byte</span><span class=p>(</span><span class=s>&#34;\033[31m已经关闭连接!\033[0m&#34;</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>                <span class=nx>ws</span><span class=p>.</span><span class=nf>Close</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>                <span class=k>return</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=nx>size</span> <span class=p>&gt;</span> <span class=mi>0</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=nx>r</span> <span class=o>&lt;-</span> <span class=nx>x</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// 主循环
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>for</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>select</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// 每隔100微秒, 只要buf的长度不为0就将数据写入ws, 并重置时间和buf
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=k>case</span> <span class=o>&lt;-</span><span class=nx>t</span><span class=p>.</span><span class=nx>C</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=nb>len</span><span class=p>(</span><span class=nx>buf</span><span class=p>)</span> <span class=o>!=</span> <span class=mi>0</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=nx>err</span> <span class=o>:=</span> <span class=nx>ws</span><span class=p>.</span><span class=nf>WriteMessage</span><span class=p>(</span><span class=nx>websocket</span><span class=p>.</span><span class=nx>TextMessage</span><span class=p>,</span> <span class=nx>buf</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>                <span class=nx>buf</span> <span class=p>=</span> <span class=p>[]</span><span class=kt>byte</span><span class=p>{}</span>
+</span></span><span class=line><span class=cl>                <span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>log</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=nx>err</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>                    <span class=k>return</span>
+</span></span><span class=line><span class=cl>                <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=nx>t</span><span class=p>.</span><span class=nf>Reset</span><span class=p>(</span><span class=nx>time</span><span class=p>.</span><span class=nx>Microsecond</span> <span class=o>*</span> <span class=mi>100</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// 前面已经将ssh channel里读取的数据写入创建的通道r, 这里读取数据, 不断增加buf的长度, 在设定的 100 microsecond后由上面判定长度是否返送数据
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=k>case</span> <span class=nx>d</span> <span class=o>:=</span> <span class=o>&lt;-</span><span class=nx>r</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=nx>d</span> <span class=o>!=</span> <span class=nx>utf8</span><span class=p>.</span><span class=nx>RuneError</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=nx>p</span> <span class=o>:=</span> <span class=nb>make</span><span class=p>([]</span><span class=kt>byte</span><span class=p>,</span> <span class=nx>utf8</span><span class=p>.</span><span class=nf>RuneLen</span><span class=p>(</span><span class=nx>d</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>                <span class=nx>utf8</span><span class=p>.</span><span class=nf>EncodeRune</span><span class=p>(</span><span class=nx>p</span><span class=p>,</span> <span class=nx>d</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>                <span class=nx>buf</span> <span class=p>=</span> <span class=nb>append</span><span class=p>(</span><span class=nx>buf</span><span class=p>,</span> <span class=nx>p</span><span class=o>...</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=nx>buf</span> <span class=p>=</span> <span class=nb>append</span><span class=p>(</span><span class=nx>buf</span><span class=p>,</span> <span class=p>[]</span><span class=nb>byte</span><span class=p>(</span><span class=s>&#34;@&#34;</span><span class=p>)</span><span class=o>...</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}()</span>
+</span></span></code></pre></td></tr></table></div></div><p>web terminal的后台建好了</p><h3 id=前端>前端</h3><p>前端我选择用了vue框架(其实这么小的项目完全不用vue), 终端工具用的是xterm, vscode内置的终端也是采用的xterm.这里贴一段关键代码, <a href=https://github.com/chengjoey/web-terminal-client target=_blank rel="noopener noreffer">前端项目地址</a></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-javascript data-lang=javascript><span class=line><span class=cl><span class=nx>mounted</span> <span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nx>containerWidth</span> <span class=o>=</span> <span class=nb>window</span><span class=p>.</span><span class=nx>screen</span><span class=p>.</span><span class=nx>height</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nx>containerHeight</span> <span class=o>=</span> <span class=nb>window</span><span class=p>.</span><span class=nx>screen</span><span class=p>.</span><span class=nx>width</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nx>cols</span> <span class=o>=</span> <span class=nb>Math</span><span class=p>.</span><span class=nx>floor</span><span class=p>((</span><span class=nx>containerWidth</span> <span class=o>-</span> <span class=mi>30</span><span class=p>)</span> <span class=o>/</span> <span class=mi>9</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nx>rows</span> <span class=o>=</span> <span class=nb>Math</span><span class=p>.</span><span class=nx>floor</span><span class=p>(</span><span class=nb>window</span><span class=p>.</span><span class=nx>innerHeight</span><span class=o>/</span><span class=mi>17</span><span class=p>)</span> <span class=o>-</span> <span class=mi>2</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=k>this</span><span class=p>.</span><span class=nx>username</span> <span class=o>===</span> <span class=kc>undefined</span><span class=p>){</span>
+</span></span><span class=line><span class=cl>        <span class=kd>var</span> <span class=nx>url</span> <span class=o>=</span> <span class=p>(</span><span class=nx>location</span><span class=p>.</span><span class=nx>protocol</span> <span class=o>===</span> <span class=s2>&#34;http:&#34;</span> <span class=o>?</span> <span class=s2>&#34;ws&#34;</span> <span class=o>:</span> <span class=s2>&#34;wss&#34;</span><span class=p>)</span> <span class=o>+</span> <span class=s2>&#34;://&#34;</span> <span class=o>+</span> <span class=nx>location</span><span class=p>.</span><span class=nx>hostname</span> <span class=o>+</span> <span class=s2>&#34;:5001&#34;</span> <span class=o>+</span> <span class=s2>&#34;/ws&#34;</span><span class=o>+</span> <span class=s2>&#34;?&#34;</span> <span class=o>+</span> <span class=s2>&#34;msg=&#34;</span> <span class=o>+</span> <span class=k>this</span><span class=p>.</span><span class=nx>msg</span> <span class=o>+</span> <span class=s2>&#34;&amp;rows=&#34;</span> <span class=o>+</span> <span class=nx>rows</span> <span class=o>+</span> <span class=s2>&#34;&amp;cols=&#34;</span> <span class=o>+</span> <span class=nx>cols</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span><span class=k>else</span><span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=kd>var</span> <span class=nx>url</span> <span class=o>=</span> <span class=p>(</span><span class=nx>location</span><span class=p>.</span><span class=nx>protocol</span> <span class=o>===</span> <span class=s2>&#34;http:&#34;</span> <span class=o>?</span> <span class=s2>&#34;ws&#34;</span> <span class=o>:</span> <span class=s2>&#34;wss&#34;</span><span class=p>)</span> <span class=o>+</span> <span class=s2>&#34;://&#34;</span> <span class=o>+</span> <span class=nx>location</span><span class=p>.</span><span class=nx>hostname</span> <span class=o>+</span> <span class=s2>&#34;:5001&#34;</span> <span class=o>+</span> <span class=s2>&#34;/ws&#34;</span><span class=o>+</span> <span class=s2>&#34;?&#34;</span> <span class=o>+</span> <span class=s2>&#34;msg=&#34;</span> <span class=o>+</span> <span class=k>this</span><span class=p>.</span><span class=nx>msg</span> <span class=o>+</span> <span class=s2>&#34;&amp;rows=&#34;</span> <span class=o>+</span> <span class=nx>rows</span> <span class=o>+</span> <span class=s2>&#34;&amp;cols=&#34;</span> <span class=o>+</span> <span class=nx>cols</span> <span class=o>+</span> <span class=s2>&#34;&amp;username=&#34;</span> <span class=o>+</span> <span class=k>this</span><span class=p>.</span><span class=nx>username</span> <span class=o>+</span> <span class=s2>&#34;&amp;password=&#34;</span> <span class=o>+</span> <span class=k>this</span><span class=p>.</span><span class=nx>password</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nx>terminalContainer</span> <span class=o>=</span> <span class=nb>document</span><span class=p>.</span><span class=nx>getElementById</span><span class=p>(</span><span class=s1>&#39;terminal&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>this</span><span class=p>.</span><span class=nx>term</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>Terminal</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=k>this</span><span class=p>.</span><span class=nx>term</span><span class=p>.</span><span class=nx>open</span><span class=p>(</span><span class=nx>terminalContainer</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// open websocket
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>this</span><span class=p>.</span><span class=nx>terminalSocket</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>WebSocket</span><span class=p>(</span><span class=nx>url</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>this</span><span class=p>.</span><span class=nx>terminalSocket</span><span class=p>.</span><span class=nx>onopen</span> <span class=o>=</span> <span class=k>this</span><span class=p>.</span><span class=nx>runRealTerminal</span>
+</span></span><span class=line><span class=cl>    <span class=k>this</span><span class=p>.</span><span class=nx>terminalSocket</span><span class=p>.</span><span class=nx>onclose</span> <span class=o>=</span> <span class=k>this</span><span class=p>.</span><span class=nx>closeRealTerminal</span>
+</span></span><span class=line><span class=cl>    <span class=k>this</span><span class=p>.</span><span class=nx>terminalSocket</span><span class=p>.</span><span class=nx>onerror</span> <span class=o>=</span> <span class=k>this</span><span class=p>.</span><span class=nx>errorRealTerminal</span>
+</span></span><span class=line><span class=cl>    <span class=k>this</span><span class=p>.</span><span class=nx>term</span><span class=p>.</span><span class=nx>attach</span><span class=p>(</span><span class=k>this</span><span class=p>.</span><span class=nx>terminalSocket</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>this</span><span class=p>.</span><span class=nx>term</span><span class=p>.</span><span class=nx>_initialized</span> <span class=o>=</span> <span class=kc>true</span>
+</span></span><span class=line><span class=cl>    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=s1>&#39;mounted is going on&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><div class="details admonition note open"><div class="details-summary admonition-title"><i class="icon fas fa-pencil-alt fa-fw"></i>注意<i class="details-icon fas fa-angle-right fa-fw"></i></div><div class=details-content><div class=admonition-content>在使用xterm时需要将其css文件也导入，不然会有显示问题</div></div></div><h2 id=参考>参考</h2><ol><li><a href=https://github.com/piupuer/gin-web/blob/dev/api/v1/sys_machine_ws.go target=_blank rel="noopener noreffer">gin-web-machine-ws</a></li></ol></div><div class=post-footer id=post-footer><div class=post-info><div class=post-info-line><div class=post-info-mod><span>更新于 2021-10-24</span></div><div class=post-info-license></div></div><div class=post-info-line><div class=post-info-md></div><div class=post-info-share><span><a href=# onclick=return!1 title="分享到 Twitter" data-sharer=twitter data-url=https://www.geekby.cn/golang-ssh-websocket/ data-title=[转]Go语言实现SSH远程终端及WebSocket data-via=@geekby1024 data-hashtags=Golang,WebSocket><i class="fab fa-twitter fa-fw"></i></a><a href=# onclick=return!1 title="分享到 微博" data-sharer=weibo data-url=https://www.geekby.cn/golang-ssh-websocket/ data-title=[转]Go语言实现SSH远程终端及WebSocket data-image=https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/golang-ssh.2jel1ppf5va0.png data-ralateuid=u/5101801783><i class="fab fa-weibo fa-fw"></i></a></span></div></div></div><div class=post-info-more><section class=post-tags><i class="fas fa-tags fa-fw"></i>&nbsp;<a href=/tags/golang/>Golang</a>,&nbsp;<a href=/tags/websocket/>WebSocket</a></section><section><span><a href=# onclick=window.history.back()>返回</a></span>&nbsp;|&nbsp;<span><a href=/>主页</a></span></section></div><div class=post-nav><a href=/consul-watch-golang/ class=prev rel=prev title=使用Consul的watch机制监控服务的变化><i class="fas fa-angle-left fa-fw"></i>使用Consul的watch机制监控服务的变化</a>
+<a href=/mysql-ha/ class=next rel=next title="MySQL 高可用方案研究">MySQL 高可用方案研究<i class="fas fa-angle-right fa-fw"></i></a></div></div><div id=comments><div id=waline class=comment></div><noscript>Please enable JavaScript to view the comments powered by <a href=https://waline.js.org/>Waline</a>.</noscript></div></article></div></main><footer class=footer><div class=footer-container><div class=footer-line>由 <a href=https://gohugo.io/ target=_blank rel="noopener noreffer" title="Hugo 0.110.0">Hugo</a> 强力驱动 | 主题 - <a href=https://github.com/HEIGE-PCloud/DoIt target=_blank rel="noopener noreffer" title="DoIt 0.2.10"><i class="far fa-edit fa-fw"></i> DoIt</a></div><div class=footer-line><i class="far fa-copyright fa-fw"></i><span itemprop=copyrightYear>2020 - 2023</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=https://github.com/jackbai233 target=_blank rel="noopener noreferrer">JackBai</a></span>&nbsp;|&nbsp;<span class=license><a rel="license external nofollow noopener noreffer" href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank>CC BY-NC 4.0</a></span><span class=icp-splitter>&nbsp;|&nbsp;</span><br class=icp-br><span class=icp><a href=https://beian.miit.gov.cn/ target=_blank>陕ICP备2020013535号-2</a></span></div></div></footer></div><div id=fixed-buttons><a href=#back-to-top id=back-to-top-button class=fixed-button title=回到顶部><i class="fas fa-arrow-up fa-fw"></i>
+</a><a href=# id=view-comments class=fixed-button title=查看评论><i class="fas fa-comment fa-fw"></i></a></div><div class=assets><script type=text/javascript src=/lib/autocomplete/autocomplete.min.js></script><script type=text/javascript src=/lib/fuse/fuse.min.js></script><script type=text/javascript src=/lib/lazysizes/lazysizes.min.js></script><script type=text/javascript src=/lib/topbar/topbar.min.js></script><script type=text/javascript src=/lib/pjax/pjax.min.js></script><script type=text/javascript src=/js/theme.min.js></script></div><div class=pjax-assets><script type=text/javascript src=/lib/waline/Waline.min.js></script><script type=text/javascript src=/lib/lightgallery/lightgallery.min.js></script><script type=text/javascript src=/lib/lightgallery/lg-thumbnail.min.js></script><script type=text/javascript src=/lib/lightgallery/lg-zoom.min.js></script><script type=text/javascript src=/lib/clipboard/clipboard.min.js></script><script type=text/javascript src=/lib/sharer/sharer.min.js></script><script type=text/javascript src=/lib/katex/katex.min.js></script><script type=text/javascript src=/lib/katex/auto-render.min.js></script><script type=text/javascript src=/lib/katex/copy-tex.min.js></script><script type=text/javascript src=/lib/katex/mhchem.min.js></script><script type=text/javascript>window.config={code:{copyTitle:"复制到剪贴板",maxShownLines:20},comment:{waline:{copyright:!0,dark:"body[theme='dark'], body[theme='black']",el:"#waline",emoji:["https://cdn.jsdelivr.net/gh/walinejs/emojis/weibo","https://cdn.jsdelivr.net/gh/walinejs/emojis@1.0.0/bilibili"],highlight:!0,lang:"zh-cn",login:"enable",meta:["nick","mail","link"],pageSize:10,serverURL:"https://geekby-comment-gof863phj-jackbai233.vercel.app/",visitor:!0}},lightGallery:{actualSize:!1,exThumbImage:"data-thumbnail",hideBarsDelay:2e3,selector:".lightgallery",speed:400,thumbContHeight:80,thumbWidth:80,thumbnail:!0},math:{delimiters:[{display:!0,left:"$$",right:"$$"},{display:!0,left:"\\[",right:"\\]"},{display:!1,left:"$",right:"$"},{display:!1,left:"\\(",right:"\\)"}],strict:!1},search:{distance:100,findAllMatches:!1,fuseIndexURL:"/index.json",highlightTag:"em",ignoreFieldNorm:!1,ignoreLocation:!1,isCaseSensitive:!1,location:0,maxResultLength:10,minMatchCharLength:2,noResultsFound:"没有找到结果",snippetLength:50,threshold:.3,type:"fuse",useExtendedSearch:!1},sharerjs:!0}</script><link rel=stylesheet href=/lib/lightgallery/lightgallery.min.css><link rel=stylesheet href=/lib/katex/katex.min.css><link rel=stylesheet href=/lib/katex/copy-tex.min.css></div></body></html>

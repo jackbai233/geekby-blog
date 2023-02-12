@@ -1,0 +1,723 @@
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="noodp"><title class=pjax-title>Django使用DataTables插件总结 - geekbyの自留地</title><meta name=Description content="这篇文章总结了怎样在Django中使用DataTables."><meta property="og:title" content="Django使用DataTables插件总结"><meta property="og:description" content="这篇文章总结了怎样在Django中使用DataTables."><meta property="og:type" content="article"><meta property="og:url" content="https://www.geekby.cn/django-datatables/"><meta property="og:image" content="https://www.geekby.cn/images/avatar.png"><meta property="article:section" content="posts"><meta property="article:published_time" content="2018-09-15T16:25:50+08:00"><meta property="article:modified_time" content="2018-09-15T16:25:50+08:00"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://www.geekby.cn/images/avatar.png"><meta name=twitter:title content="Django使用DataTables插件总结"><meta name=twitter:description content="这篇文章总结了怎样在Django中使用DataTables."><meta name=application-name content="geekby"><meta name=apple-mobile-web-app-title content="geekby"><meta name=theme-color content="#f8f8f8"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=canonical href=https://www.geekby.cn/django-datatables/><link rel=prev href=https://www.geekby.cn/python-grpc/><link rel=next href=https://www.geekby.cn/python-tfs/><link rel=stylesheet href=/lib/normalize/normalize.min.css><link rel=stylesheet href=/css/style.min.css><link rel=preload as=style onload='this.onload=null,this.rel="stylesheet"' href=/lib/fontawesome-free/all.min.css><noscript><link rel=stylesheet href=/lib/fontawesome-free/all.min.css></noscript><link rel=preload as=style onload='this.onload=null,this.rel="stylesheet"' href=/lib/animate/animate.min.css><noscript><link rel=stylesheet href=/lib/animate/animate.min.css></noscript><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"Django使用DataTables插件总结","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/www.geekby.cn\/django-datatables\/"},"genre":"posts","keywords":"Django, DataTables","wordcount":4510,"url":"https:\/\/www.geekby.cn\/django-datatables\/","datePublished":"2018-09-15T16:25:50+08:00","dateModified":"2018-09-15T16:25:50+08:00","publisher":{"@type":"Organization","name":""},"author":{"@type":"Person","name":"JackBai"},"description":"这篇文章总结了怎样在Django中使用DataTables."}</script></head><body header-desktop=fixed header-mobile=auto><script type=text/javascript>function setTheme(e){document.body.setAttribute("theme",e)}function saveTheme(e){window.localStorage&&localStorage.setItem("theme",e)}function getMeta(e){const t=document.getElementsByTagName("meta");for(let n=0;n<t.length;n++)if(t[n].getAttribute("name")===e)return t[n];return""}if(window.localStorage&&localStorage.getItem("theme")){let e=localStorage.getItem("theme");e==="light"||e==="dark"||e==="black"?setTheme(e):setTheme(window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")}else"auto"==="light"||"auto"==="dark"||"auto"==="black"?(setTheme("auto"),saveTheme("auto")):(saveTheme("auto"),setTheme(window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"));let metaColors={light:"#f8f8f8",dark:"#252627",black:"#000000"};getMeta("theme-color").content=metaColors[document.body.getAttribute("theme")]</script><div id=back-to-top></div><div id=mask></div><div class=wrapper><header class=desktop id=header-desktop><div class=header-wrapper><div class=header-title><a href=/ title=geekbyの自留地>geekbyの自留地</a></div><div class=menu><div class=menu-inner><a class=menu-item href=/posts/>文章 </a><a class=menu-item href=/tags/>标签 </a><a class=menu-item href=/categories/>分类 </a><a class=menu-item href=/about/>关于 </a><a class=menu-item href=https://github.com/jackbai233 title=Github rel="noopener noreffer" target=_blank><i class='fab fa-github fa-fw'></i> </a><span class="menu-item delimiter"></span><span class="menu-item search" id=search-desktop>
+<input type=text placeholder=搜索文章标题或内容... id=search-input-desktop>
+<a href=# onclick=return!1 class="search-button search-toggle" id=search-toggle-desktop title=搜索><i class="fas fa-search fa-fw"></i></a>
+<a href=# onclick=return!1 class="search-button search-clear" id=search-clear-desktop title=清空><i class="fas fa-times-circle fa-fw"></i></a>
+<span class="search-button search-loading" id=search-loading-desktop><i class="fas fa-spinner fa-fw fa-spin"></i></span>
+</span><a href=# onclick=return!1 class="menu-item theme-switch" title=切换主题><i class="fas fa-adjust fa-fw"></i></a></div></div></div></header><header class=mobile id=header-mobile><div class=header-container><div class=header-wrapper><div class=header-title><a href=/ title=geekbyの自留地>geekbyの自留地</a></div><div class=menu-toggle id=menu-toggle-mobile><span></span><span></span><span></span></div></div><div class=menu id=menu-mobile><div class=search-wrapper><div class="search mobile" id=search-mobile><input type=text placeholder=搜索文章标题或内容... id=search-input-mobile>
+<a href=# onclick=return!1 class="search-button search-toggle" id=search-toggle-mobile title=搜索><i class="fas fa-search fa-fw"></i></a>
+<a href=# onclick=return!1 class="search-button search-clear" id=search-clear-mobile title=清空><i class="fas fa-times-circle fa-fw"></i></a>
+<span class="search-button search-loading" id=search-loading-mobile><i class="fas fa-spinner fa-fw fa-spin"></i></span></div><a href=# onclick=return!1 class=search-cancel id=search-cancel-mobile>取消</a></div><a class=menu-item href=/posts/ title>文章</a><a class=menu-item href=/tags/ title>标签</a><a class=menu-item href=/categories/ title>分类</a><a class=menu-item href=/about/ title>关于</a><a class=menu-item href=https://github.com/jackbai233 title=Github rel="noopener noreffer" target=_blank><i class='fab fa-github fa-fw'></i></a><a href=# onclick=return!1 class="menu-item theme-switch" title=切换主题>
+<i class="fas fa-adjust fa-fw"></i></a></div></div></header><div class="search-dropdown desktop"><div id=search-dropdown-desktop></div></div><div class="search-dropdown mobile"><div id=search-dropdown-mobile></div></div><main class=main><div class=container><div class=toc id=toc-auto><h2 class=toc-title>目录</h2><div class=toc-content id=toc-content-auto></div></div><script>document.getElementsByTagName("main")[0].setAttribute("pageStyle","normal")</script><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC","true")</script><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Django使用DataTables插件总结</h1><div class=post-meta><div class=post-meta-line><span class=post-author><i class="author fas fa-user-circle fa-fw"></i><a href=https://www.geekby.cn title=Author target=_blank rel="noopener noreffer author" class=author>JackBai</a>
+</span>&nbsp;<span class=post-category>收录于 </span>&nbsp;<span class=post-category>类别 <a href=/categories/python/><i class="far fa-folder fa-fw"></i>Python</a></span></div><div class=post-meta-line><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime=2018-09-15>2018-09-15</time>&nbsp;<i class="far fa-edit fa-fw"></i>&nbsp;<time datetime=2018-09-15>2018-09-15</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 4510 字&nbsp;
+<i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 10 分钟&nbsp;<span id=/django-datatables/ class=leancloud_visitors data-flag-title=Django使用DataTables插件总结>
+<i class="far fa-eye fa-fw"></i>&nbsp;<span class=leancloud-visitors-count></span>&nbsp;次阅读
+</span>&nbsp;<span id=/django-datatables/ class=comment_count data-flag-title=Django使用DataTables插件总结>
+<i class="far fa-comments fa-fw"></i>&nbsp;<span class=waline-comment-count id=waline-comment-count></span>&nbsp;条评论
+</span>&nbsp;</div></div><div class=featured-image><img class=lazyload data-src=https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/django-datatables.4s58ppjmua60.png data-srcset="https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/django-datatables.4s58ppjmua60.png, https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/django-datatables.4s58ppjmua60.png 1.5x, https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/django-datatables.4s58ppjmua60.png 2x" data-sizes=auto alt=https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/django-datatables.4s58ppjmua60.png title=这篇文章总结了怎样在Django中使用DataTables. height=auto width=auto></div><div class="details toc" id=toc-static kept><div class="details-summary toc-title"><span>目录</span>
+<span><i class="details-icon fas fa-angle-right"></i></span></div><div class="details-content toc-content" id=toc-content-static><nav id=TableOfContents><ul><li><a href=#基本使用>基本使用</a></li><li><a href=#与django结合使用>与django结合使用</a><ul><li><a href=#基本使用-1>基本使用</a></li><li><a href=#ajax请求数据使用>ajax请求数据使用</a><ul><li><a href=#基本操作>基本操作</a></li><li><a href=#后端分页>后端分页</a></li></ul></li></ul></li><li><a href=#最后>最后</a></li></ul></nav></div></div><div class=content id=content><p>Datatables插件是一款方便简单的展示数据的列表插件，本文介绍了怎样在Django中使用它。</p><div class="details admonition tip open"><div class="details-summary admonition-title"><i class="icon fas fa-lightbulb fa-fw"></i>提示<i class="details-icon fas fa-angle-right fa-fw"></i></div><div class=details-content><div class=admonition-content>文章中例子已上传至<a href=https://github.com/jackbai233/Django-Datatables-Example target=_blank rel="noopener noreffer">github</a></div></div></div><h2 id=基本使用>基本使用</h2><p>Datatables插件是一款方便简单的展示数据的列表插件。关于基本使用，<a href=https://datatables.net/examples/basic_init/zero_configuration.html target=_blank rel="noopener noreffer">官方网站</a>上的已介绍的很详细，这里我再稍微过一下。</p><ol><li><p>js配置。包含jquery和datatables的js</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-javascript data-lang=javascript><span class=line><span class=cl>    <span class=o>&lt;</span><span class=nx>script</span> <span class=nx>src</span><span class=o>=</span><span class=s2>&#34;https://code.jquery.com/jquery-3.3.1.js&#34;</span><span class=o>&gt;&lt;</span><span class=err>/script&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=o>&lt;</span><span class=nx>script</span> <span class=nx>stc</span><span class=o>=</span><span class=s2>&#34;https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js&#34;</span><span class=o>&gt;&lt;</span><span class=err>/script&gt;</span>
+</span></span></code></pre></td></tr></table></div></div></li><li><p>css配置。包含dataTables的css</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-css data-lang=css><span class=line><span class=cl> <span class=o>&lt;</span><span class=nt>link</span> <span class=nt>href</span><span class=o>=</span><span class=s2>&#34;https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css&#34;</span> <span class=nt>rel</span><span class=o>=</span><span class=s2>&#34;stylesheet&#34;</span><span class=o>&gt;</span>
+</span></span></code></pre></td></tr></table></div></div></li><li><p>html。初始化表格</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-html data-lang=html><span class=line><span class=cl> <span class=p>&lt;</span><span class=nt>table</span> <span class=na>id</span><span class=o>=</span><span class=s>&#34;example&#34;</span> <span class=na>class</span><span class=o>=</span><span class=s>&#34;display&#34;</span> <span class=na>style</span><span class=o>=</span><span class=s>&#34;width:100%&#34;</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>        <span class=p>&lt;</span><span class=nt>thead</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>            <span class=p>&lt;</span><span class=nt>tr</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>                <span class=p>&lt;</span><span class=nt>th</span><span class=p>&gt;</span>Name<span class=p>&lt;/</span><span class=nt>th</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>                <span class=p>&lt;</span><span class=nt>th</span><span class=p>&gt;</span>Position<span class=p>&lt;/</span><span class=nt>th</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>                <span class=p>&lt;</span><span class=nt>th</span><span class=p>&gt;</span>Office<span class=p>&lt;/</span><span class=nt>th</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>                <span class=p>&lt;</span><span class=nt>th</span><span class=p>&gt;</span>Age<span class=p>&lt;/</span><span class=nt>th</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>                <span class=p>&lt;</span><span class=nt>th</span><span class=p>&gt;</span>Start date<span class=p>&lt;/</span><span class=nt>th</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>                <span class=p>&lt;</span><span class=nt>th</span><span class=p>&gt;</span>Salary<span class=p>&lt;/</span><span class=nt>th</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>            <span class=p>&lt;/</span><span class=nt>tr</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>        <span class=p>&lt;/</span><span class=nt>thead</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>        <span class=p>&lt;</span><span class=nt>tbody</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>            <span class=p>&lt;</span><span class=nt>tr</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>                <span class=p>&lt;</span><span class=nt>td</span><span class=p>&gt;</span>Tiger Nixon<span class=p>&lt;/</span><span class=nt>td</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>                <span class=p>&lt;</span><span class=nt>td</span><span class=p>&gt;</span>System Architect<span class=p>&lt;/</span><span class=nt>td</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>                <span class=p>&lt;</span><span class=nt>td</span><span class=p>&gt;</span>Edinburgh<span class=p>&lt;/</span><span class=nt>td</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>                <span class=p>&lt;</span><span class=nt>td</span><span class=p>&gt;</span>61<span class=p>&lt;/</span><span class=nt>td</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>                <span class=p>&lt;</span><span class=nt>td</span><span class=p>&gt;</span>2011/04/25<span class=p>&lt;/</span><span class=nt>td</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>                <span class=p>&lt;</span><span class=nt>td</span><span class=p>&gt;</span>$320,800<span class=p>&lt;/</span><span class=nt>td</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>            <span class=p>&lt;/</span><span class=nt>tr</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>            <span class=p>&lt;</span><span class=nt>tr</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>                <span class=p>&lt;</span><span class=nt>td</span><span class=p>&gt;</span>Garrett Winters<span class=p>&lt;/</span><span class=nt>td</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>                <span class=p>&lt;</span><span class=nt>td</span><span class=p>&gt;</span>Accountant<span class=p>&lt;/</span><span class=nt>td</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>                <span class=p>&lt;</span><span class=nt>td</span><span class=p>&gt;</span>Tokyo<span class=p>&lt;/</span><span class=nt>td</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>                <span class=p>&lt;</span><span class=nt>td</span><span class=p>&gt;</span>63<span class=p>&lt;/</span><span class=nt>td</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>                <span class=p>&lt;</span><span class=nt>td</span><span class=p>&gt;</span>2011/07/25<span class=p>&lt;/</span><span class=nt>td</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>                <span class=p>&lt;</span><span class=nt>td</span><span class=p>&gt;</span>$170,750<span class=p>&lt;/</span><span class=nt>td</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>            <span class=p>&lt;/</span><span class=nt>tr</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>            <span class=p>&lt;</span><span class=nt>tr</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>                <span class=p>&lt;</span><span class=nt>td</span><span class=p>&gt;</span>Ashton Cox<span class=p>&lt;/</span><span class=nt>td</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>                <span class=p>&lt;</span><span class=nt>td</span><span class=p>&gt;</span>Junior Technical Author<span class=p>&lt;/</span><span class=nt>td</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>                <span class=p>&lt;</span><span class=nt>td</span><span class=p>&gt;</span>San Francisco<span class=p>&lt;/</span><span class=nt>td</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>                <span class=p>&lt;</span><span class=nt>td</span><span class=p>&gt;</span>66<span class=p>&lt;/</span><span class=nt>td</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>                <span class=p>&lt;</span><span class=nt>td</span><span class=p>&gt;</span>2009/01/12<span class=p>&lt;/</span><span class=nt>td</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>                <span class=p>&lt;</span><span class=nt>td</span><span class=p>&gt;</span>$86,000<span class=p>&lt;/</span><span class=nt>td</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>            <span class=p>&lt;/</span><span class=nt>tr</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>        <span class=p>&lt;/</span><span class=nt>tbody</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=p>&lt;/</span><span class=nt>table</span><span class=p>&gt;</span>
+</span></span></code></pre></td></tr></table></div></div></li><li><p>js配置。是表格dataTable化</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-javascript data-lang=javascript><span class=line><span class=cl> <span class=o>&lt;</span><span class=nx>script</span> <span class=nx>type</span><span class=o>=</span><span class=s2>&#34;text/javascript&#34;</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl>     <span class=nx>$</span><span class=p>(</span><span class=nb>document</span><span class=p>).</span><span class=nx>ready</span><span class=p>(</span><span class=kd>function</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>$</span><span class=p>(</span><span class=s1>&#39;#example&#39;</span><span class=p>).</span><span class=nx>DataTable</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span> <span class=p>);</span>
+</span></span><span class=line><span class=cl> <span class=o>&lt;</span><span class=err>/script&gt;</span>
+</span></span></code></pre></td></tr></table></div></div></li></ol><h2 id=与django结合使用>与django结合使用</h2><p>这里以一个展示用户姓名年龄的表格举例。假设数据库(数据库使用Django默认自带数据库)中有表格User,它的字段有name、age两项。</p><h3 id=基本使用-1>基本使用</h3><blockquote><p>基本使用的话，则是django作为后端，将要显示的数据传给DataTables进行展示。具体用法比较简单，DataTables的官网也很详细了。(官网文档都是第一份资料)
+不多说，直接上代码</p></blockquote><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>def</span> <span class=nf>get_basic_tables</span><span class=p>(</span><span class=n>request</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>    创建基本的DataTables表格
+</span></span></span><span class=line><span class=cl><span class=s2>    &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>user_list</span> <span class=o>=</span> <span class=p>[]</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=n>user_info</span> <span class=ow>in</span> <span class=n>User</span><span class=o>.</span><span class=n>objects</span><span class=o>.</span><span class=n>all</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>        <span class=n>user_list</span><span class=o>.</span><span class=n>append</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>            <span class=s1>&#39;name&#39;</span><span class=p>:</span> <span class=n>user_info</span><span class=o>.</span><span class=n>name</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=s1>&#39;age&#39;</span><span class=p>:</span> <span class=n>user_info</span><span class=o>.</span><span class=n>age</span>
+</span></span><span class=line><span class=cl>        <span class=p>})</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>render</span><span class=p>(</span><span class=n>request</span><span class=p>,</span> <span class=s1>&#39;example/basic_tables.html&#39;</span><span class=p>,</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=s1>&#39;users&#39;</span><span class=p>:</span> <span class=n>user_list</span>
+</span></span><span class=line><span class=cl>    <span class=p>})</span>
+</span></span></code></pre></td></tr></table></div></div><p>上面代码主要就是将数据取出并返回。
+前端的展示代码如下：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-html data-lang=html><span class=line><span class=cl><span class=p>&lt;</span><span class=nt>table</span> <span class=na>id</span><span class=o>=</span><span class=s>&#34;basic-table&#34;</span> <span class=na>class</span><span class=o>=</span><span class=s>&#34;table table-hover&#34;</span> <span class=na>width</span><span class=o>=</span><span class=s>&#34;100%&#34;</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=p>&lt;</span><span class=nt>thead</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>        <span class=p>&lt;</span><span class=nt>tr</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>            <span class=p>&lt;</span><span class=nt>th</span><span class=p>&gt;</span>学号<span class=p>&lt;/</span><span class=nt>th</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>            <span class=p>&lt;</span><span class=nt>th</span><span class=p>&gt;</span>姓名<span class=p>&lt;/</span><span class=nt>th</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>            <span class=p>&lt;</span><span class=nt>th</span><span class=p>&gt;</span>年龄<span class=p>&lt;/</span><span class=nt>th</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>        <span class=p>&lt;/</span><span class=nt>tr</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=p>&lt;/</span><span class=nt>thead</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=p>&lt;</span><span class=nt>tbody</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=p>&lt;/</span><span class=nt>tbody</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl><span class=p>&lt;/</span><span class=nt>table</span><span class=p>&gt;</span>
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-javascript data-lang=javascript><span class=line><span class=cl>    <span class=nx>$</span><span class=p>(</span><span class=nb>document</span><span class=p>).</span><span class=nx>ready</span><span class=p>(</span><span class=kd>function</span> <span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>$</span><span class=p>(</span><span class=s2>&#34;#basic-table&#34;</span><span class=p>).</span><span class=nx>DataTable</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>            <span class=c1>// 表下方页脚的类型，具体类别比较到，见[官网](https://datatables.net/examples/basic_init/alt_pagination.html)
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=s2>&#34;pagingType&#34;</span><span class=o>:</span> <span class=s2>&#34;simple_numbers&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=c1>//启动搜索框
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=nx>searching</span><span class=o>:</span> <span class=kc>true</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nx>destroy</span> <span class=o>:</span> <span class=kc>true</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=c1>// 保存刷新时原表的状态
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=nx>stateSave</span><span class=o>:</span> <span class=kc>true</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=c1>// 将显示的语言初始化为中文
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=s2>&#34;language&#34;</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;lengthMenu&#34;</span><span class=o>:</span> <span class=s2>&#34;选择每页 _MENU_ 展示 &#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;zeroRecords&#34;</span><span class=o>:</span> <span class=s2>&#34;未找到匹配结果--抱歉&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;info&#34;</span><span class=o>:</span> <span class=s2>&#34;当前显示第 _PAGE_ 页结果，共 _PAGES_ 页&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;infoEmpty&#34;</span><span class=o>:</span> <span class=s2>&#34;没有数据&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;infoFiltered&#34;</span><span class=o>:</span> <span class=s2>&#34;(获取 _MAX_ 项结果)&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;paginate&#34;</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                    <span class=s2>&#34;first&#34;</span><span class=o>:</span> <span class=s2>&#34;首页&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=s2>&#34;previous&#34;</span><span class=o>:</span> <span class=s2>&#34;上一页&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=s2>&#34;next&#34;</span><span class=o>:</span> <span class=s2>&#34;下一页&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=s2>&#34;last&#34;</span><span class=o>:</span> <span class=s2>&#34;末页&#34;</span>
+</span></span><span class=line><span class=cl>                <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=p>},</span>
+</span></span><span class=line><span class=cl>            <span class=c1>// 此处重要，该data就是dataTables要展示的数据.users即为后台传递过来的数据
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=nx>data</span><span class=o>:</span> <span class=p>{{</span> <span class=nx>users</span> <span class=o>|</span> <span class=nx>safe</span> <span class=p>}},</span>
+</span></span><span class=line><span class=cl>            <span class=nx>columns</span><span class=o>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>                <span class=p>{</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>data</span><span class=o>:</span> <span class=kc>null</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>width</span><span class=o>:</span> <span class=s2>&#34;1%&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=c1>// 若想前端显示的不一样，则需要&#34;render&#34;函数
+</span></span></span><span class=line><span class=cl><span class=c1></span>                    <span class=s1>&#39;render&#39;</span><span class=o>:</span> <span class=kd>function</span> <span class=p>(</span><span class=nx>data</span><span class=p>,</span> <span class=nx>type</span><span class=p>,</span> <span class=nx>full</span><span class=p>,</span> <span class=nx>meta</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                        <span class=k>return</span> <span class=nx>meta</span><span class=p>.</span><span class=nx>row</span> <span class=o>+</span> <span class=mi>1</span> <span class=o>+</span> <span class=nx>meta</span><span class=p>.</span><span class=nx>settings</span><span class=p>.</span><span class=nx>_iDisplayStart</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>                    <span class=p>}</span>
+</span></span><span class=line><span class=cl>                <span class=p>},</span>
+</span></span><span class=line><span class=cl>                <span class=p>{</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>data</span><span class=o>:</span> <span class=s2>&#34;name&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=s1>&#39;render&#39;</span><span class=o>:</span> <span class=kd>function</span> <span class=p>(</span><span class=nx>data</span><span class=p>,</span> <span class=nx>type</span><span class=p>,</span> <span class=nx>full</span><span class=p>,</span> <span class=nx>meta</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                        <span class=k>return</span> <span class=s1>&#39;&lt;a class=&#34;text-warning&#34; style=&#34;color:#007bff&#34; title=&#34;年龄为&#39;</span><span class=o>+</span> <span class=nx>full</span><span class=p>.</span><span class=nx>age</span> <span class=o>+</span><span class=s1>&#39;&#34;&gt;&#39;</span><span class=o>+</span> <span class=nx>data</span> <span class=o>+</span><span class=s1>&#39;&lt;/a&gt;&#39;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>                    <span class=p>}</span>
+</span></span><span class=line><span class=cl>                <span class=p>},</span>
+</span></span><span class=line><span class=cl>                <span class=p>{</span><span class=nx>data</span><span class=o>:</span> <span class=s1>&#39;age&#39;</span><span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=p>]</span>
+</span></span><span class=line><span class=cl>        <span class=p>})</span>
+</span></span><span class=line><span class=cl>    <span class=p>});</span>
+</span></span></code></pre></td></tr></table></div></div><p><img class=lazyload data-src="https://img-blog.csdnimg.cn/2019092823405112.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3hpYW9iYWlfb2w=,size_16,color_FFFFFF,t_70" data-srcset="https://img-blog.csdnimg.cn/2019092823405112.png?x-oss-process=image/watermark%2ctype_ZmFuZ3poZW5naGVpdGk%2cshadow_10%2ctext_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3hpYW9iYWlfb2w=%2csize_16%2ccolor_FFFFFF%2ct_70, https://img-blog.csdnimg.cn/2019092823405112.png?x-oss-process=image/watermark%2ctype_ZmFuZ3poZW5naGVpdGk%2cshadow_10%2ctext_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3hpYW9iYWlfb2w=%2csize_16%2ccolor_FFFFFF%2ct_70 1.5x, https://img-blog.csdnimg.cn/2019092823405112.png?x-oss-process=image/watermark%2ctype_ZmFuZ3poZW5naGVpdGk%2cshadow_10%2ctext_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3hpYW9iYWlfb2w=%2csize_16%2ccolor_FFFFFF%2ct_70 2x" data-sizes=auto alt="https://img-blog.csdnimg.cn/2019092823405112.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3hpYW9iYWlfb2w=,size_16,color_FFFFFF,t_70" title=在这里插入图片描述>
+可以看到html中只初始化了表头，表的内容则在javascript中控制。最终显示出来的数据行，第一列是对表格数据的排序。从代码中看出，当data对应的数据被置为null时，单元格中的内容将由"render"对应的函数返回值决定。第一列datarender函数中meta.row相当于表格中行的索引，默认是从<strong>0</strong>开始，故为了学号显示从1开始，进行了加1操作。
+render函数中的四个参数可谓是大有作用。 参数data刚好就是该函数上方“data”键对应的值的内容，比如第二列中的数据为‘data”键的值为name，则render函数中data就是name。而参数full相当于后端传递过来的users中的每个user的索引，这样某一个单元格的内容想与它所在行的其他单元格进行互动，则可用full参数来传递。表格中当使用鼠标移动到名字上时，会显示到该人名的年龄，这一功能就是使用了full：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-javascript data-lang=javascript><span class=line><span class=cl>   <span class=p>{</span>
+</span></span><span class=line><span class=cl>       <span class=nx>data</span><span class=o>:</span> <span class=s2>&#34;name&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>       <span class=s1>&#39;render&#39;</span><span class=o>:</span> <span class=kd>function</span> <span class=p>(</span><span class=nx>data</span><span class=p>,</span> <span class=nx>type</span><span class=p>,</span> <span class=nx>full</span><span class=p>,</span> <span class=nx>meta</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>           <span class=k>return</span> <span class=s1>&#39;&lt;a class=&#34;text-warning&#34; style=&#34;color:#007bff&#34; title=&#34;年龄为&#39;</span><span class=o>+</span> <span class=nx>full</span><span class=p>.</span><span class=nx>age</span> <span class=o>+</span><span class=s1>&#39;&#34;&gt;&#39;</span><span class=o>+</span> <span class=nx>data</span> <span class=o>+</span><span class=s1>&#39;&lt;/a&gt;&#39;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>       <span class=p>}</span>
+</span></span><span class=line><span class=cl>   <span class=p>},</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=ajax请求数据使用>ajax请求数据使用</h3><h4 id=基本操作>基本操作</h4><p>这种使用方法，则是前端发送ajax请求去后端获取数据，而不是一开始就有后端将数据传送到前端的。当数据再由后端传递回前端时，前端会自己进行处理，如分页等。下面例子是展示年龄为22周岁的人员表格</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-html data-lang=html><span class=line><span class=cl><span class=p>&lt;</span><span class=nt>table</span> <span class=na>id</span><span class=o>=</span><span class=s>&#34;ajax-table&#34;</span> <span class=na>class</span><span class=o>=</span><span class=s>&#34;table table-hover&#34;</span> <span class=na>width</span><span class=o>=</span><span class=s>&#34;100%&#34;</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=p>&lt;</span><span class=nt>thead</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>        <span class=p>&lt;</span><span class=nt>tr</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>            <span class=p>&lt;</span><span class=nt>th</span><span class=p>&gt;</span>学号<span class=p>&lt;/</span><span class=nt>th</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>            <span class=p>&lt;</span><span class=nt>th</span><span class=p>&gt;</span>姓名<span class=p>&lt;/</span><span class=nt>th</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>            <span class=p>&lt;</span><span class=nt>th</span><span class=p>&gt;</span>年龄<span class=p>&lt;/</span><span class=nt>th</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>        <span class=p>&lt;/</span><span class=nt>tr</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=p>&lt;/</span><span class=nt>thead</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=p>&lt;</span><span class=nt>tbody</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=p>&lt;/</span><span class=nt>tbody</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl><span class=p>&lt;/</span><span class=nt>table</span><span class=p>&gt;</span>
+</span></span></code></pre></td></tr></table></div></div><p>html页面中依旧只是初始化了表头。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-javascript data-lang=javascript><span class=line><span class=cl>    <span class=nx>$</span><span class=p>(</span><span class=nb>document</span><span class=p>).</span><span class=nx>ready</span><span class=p>(</span><span class=kd>function</span> <span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=c1>//django post请求需要加认证，不能忘了
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nx>$</span><span class=p>.</span><span class=nx>ajaxSetup</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>            <span class=nx>data</span><span class=o>:</span> <span class=p>{</span><span class=nx>csrfmiddlewaretoken</span><span class=o>:</span> <span class=s1>&#39;{{ csrf_token }}&#39;</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=kd>var</span> <span class=nx>table</span> <span class=o>=</span> <span class=nx>$</span><span class=p>(</span><span class=s1>&#39;#ajax-table&#39;</span><span class=p>).</span><span class=nx>DataTable</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>            <span class=s2>&#34;pagingType&#34;</span><span class=o>:</span> <span class=s2>&#34;full_numbers&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=c1>// 跟基本使用对比，已经没有data属性，而是多了&#34;ajax&#34;
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=s2>&#34;ajax&#34;</span><span class=o>:</span><span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;processing&#34;</span><span class=o>:</span> <span class=kc>true</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=c1>// ajax请求的网址
+</span></span></span><span class=line><span class=cl><span class=c1></span>                <span class=s2>&#34;url&#34;</span><span class=o>:</span> <span class=s2>&#34;{% url &#39;example:request_ajax&#39; %}&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;type&#34;</span><span class=o>:</span> <span class=s1>&#39;POST&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;data&#34;</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                    <span class=c1>// 前端向后端传递的数据age,比如只查询年龄在22岁的人员
+</span></span></span><span class=line><span class=cl><span class=c1></span>                    <span class=s2>&#34;age&#34;</span><span class=o>:</span> <span class=mi>22</span>
+</span></span><span class=line><span class=cl>                <span class=p>},</span>
+</span></span><span class=line><span class=cl>                <span class=c1>//
+</span></span></span><span class=line><span class=cl><span class=c1></span>                <span class=s2>&#34;dataSrc&#34;</span><span class=o>:</span> <span class=s2>&#34;&#34;</span>
+</span></span><span class=line><span class=cl>            <span class=p>},</span>
+</span></span><span class=line><span class=cl>            <span class=c1>// ajax请求成功传递回来后数据的展示
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=nx>columns</span><span class=o>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>               <span class=p>{</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>data</span><span class=o>:</span> <span class=kc>null</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>width</span><span class=o>:</span> <span class=s2>&#34;1%&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=c1>// 若想前端显示的不一样，则需要&#34;render&#34;函数
+</span></span></span><span class=line><span class=cl><span class=c1></span>                    <span class=s1>&#39;render&#39;</span><span class=o>:</span> <span class=kd>function</span> <span class=p>(</span><span class=nx>data</span><span class=p>,</span> <span class=nx>type</span><span class=p>,</span> <span class=nx>full</span><span class=p>,</span> <span class=nx>meta</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                        <span class=k>return</span> <span class=nx>meta</span><span class=p>.</span><span class=nx>row</span> <span class=o>+</span> <span class=mi>1</span> <span class=o>+</span> <span class=nx>meta</span><span class=p>.</span><span class=nx>settings</span><span class=p>.</span><span class=nx>_iDisplayStart</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>                    <span class=p>}</span>
+</span></span><span class=line><span class=cl>                <span class=p>},</span>
+</span></span><span class=line><span class=cl>                <span class=p>{</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>data</span><span class=o>:</span> <span class=s2>&#34;name&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=s1>&#39;render&#39;</span><span class=o>:</span> <span class=kd>function</span> <span class=p>(</span><span class=nx>data</span><span class=p>,</span> <span class=nx>type</span><span class=p>,</span> <span class=nx>full</span><span class=p>,</span> <span class=nx>meta</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                        <span class=k>return</span> <span class=s1>&#39;&lt;a class=&#34;text-warning&#34; style=&#34;color:#007bff&#34; title=&#34;年龄为&#39;</span><span class=o>+</span> <span class=nx>full</span><span class=p>.</span><span class=nx>age</span> <span class=o>+</span><span class=s1>&#39;&#34;&gt;&#39;</span><span class=o>+</span> <span class=nx>data</span> <span class=o>+</span><span class=s1>&#39;&lt;/a&gt;&#39;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>                    <span class=p>}</span>
+</span></span><span class=line><span class=cl>                <span class=p>},</span>
+</span></span><span class=line><span class=cl>                <span class=p>{</span><span class=nx>data</span><span class=o>:</span> <span class=s1>&#39;age&#39;</span><span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=p>],</span>
+</span></span><span class=line><span class=cl>            <span class=s2>&#34;language&#34;</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;processing&#34;</span><span class=o>:</span> <span class=s2>&#34;正在获取数据，请稍后...&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;lengthMenu&#34;</span><span class=o>:</span> <span class=s2>&#34;选择每页 _MENU_ 展示 &#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;zeroRecords&#34;</span><span class=o>:</span> <span class=s2>&#34;未找到匹配结果--抱歉&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;info&#34;</span><span class=o>:</span> <span class=s2>&#34;当前显示第 _PAGE_ 页结果，共 _PAGES_ 页, 共 _TOTAL_ 条记录&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;infoEmpty&#34;</span><span class=o>:</span> <span class=s2>&#34;没有数据&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;infoFiltered&#34;</span><span class=o>:</span> <span class=s2>&#34;(获取 _MAX_ 项结果)&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;sLoadingRecords&#34;</span><span class=o>:</span> <span class=s2>&#34;载入中...&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;paginate&#34;</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                    <span class=s2>&#34;first&#34;</span><span class=o>:</span> <span class=s2>&#34;首页&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=s2>&#34;previous&#34;</span><span class=o>:</span> <span class=s2>&#34;上一页&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=s2>&#34;next&#34;</span><span class=o>:</span> <span class=s2>&#34;下一页&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=s2>&#34;last&#34;</span><span class=o>:</span> <span class=s2>&#34;末页&#34;</span>
+</span></span><span class=line><span class=cl>                <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span> <span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>});</span>
+</span></span></code></pre></td></tr></table></div></div><p>后端代码处理ajax请求:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>def</span> <span class=nf>request_ajax</span><span class=p>(</span><span class=n>request</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>    处理ajax的例子中的post请求
+</span></span></span><span class=line><span class=cl><span class=s2>    :param request:
+</span></span></span><span class=line><span class=cl><span class=s2>    :return:
+</span></span></span><span class=line><span class=cl><span class=s2>    &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=n>request</span><span class=o>.</span><span class=n>method</span> <span class=o>==</span> <span class=s2>&#34;POST&#34;</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=c1># print(request.POST)</span>
+</span></span><span class=line><span class=cl>            <span class=c1>#  获取到前端页面ajax传递过来的age</span>
+</span></span><span class=line><span class=cl>            <span class=n>age</span> <span class=o>=</span> <span class=nb>int</span><span class=p>(</span><span class=n>request</span><span class=o>.</span><span class=n>POST</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=s1>&#39;age&#39;</span><span class=p>,</span> <span class=mi>22</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>            <span class=n>user_list</span> <span class=o>=</span> <span class=p>[]</span>
+</span></span><span class=line><span class=cl>            <span class=k>for</span> <span class=n>user_info</span> <span class=ow>in</span> <span class=n>User</span><span class=o>.</span><span class=n>objects</span><span class=o>.</span><span class=n>filter</span><span class=p>(</span><span class=n>age</span><span class=o>=</span><span class=n>age</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>                <span class=n>user_list</span><span class=o>.</span><span class=n>append</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>                    <span class=s1>&#39;name&#39;</span><span class=p>:</span> <span class=n>user_info</span><span class=o>.</span><span class=n>name</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=s1>&#39;age&#39;</span><span class=p>:</span> <span class=n>user_info</span><span class=o>.</span><span class=n>age</span>
+</span></span><span class=line><span class=cl>                <span class=p>})</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>            <span class=c1># 主要是将数据库查询到的数据转化为json形式返回给前端</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=n>HttpResponse</span><span class=p>(</span><span class=n>json</span><span class=o>.</span><span class=n>dumps</span><span class=p>(</span><span class=n>user_list</span><span class=p>),</span> <span class=n>content_type</span><span class=o>=</span><span class=s2>&#34;application/json&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=n>HttpResponse</span><span class=p>(</span><span class=sa>f</span><span class=s1>&#39;非法请求方式&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>except</span> <span class=ne>Exception</span> <span class=k>as</span> <span class=n>e</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>HttpResponse</span><span class=p>(</span><span class=n>e</span><span class=o>.</span><span class=n>args</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>相比来看跟基本使用没多少区别，只是多了一步ajax请求而已。</p><h4 id=后端分页>后端分页</h4><p>当我们要往前端展示的数据量过大时，如果还是一股脑将数据全部扔给前端来处理，那么你会发现前端分页加载的性能很差，这时我们可以将分页操作放到后端来做。
+其实将分页放到后端的意思就是<strong>对后台数据库中的数据进行部分请求</strong>。我们首先可以这样想：<strong>“用户在前端页面查看表格时，他其实只关心这一页数据，他看不到其他页的数据。要看到其他页的数据，他必须得点击网页中的上一页或下一页按钮。”</strong> 理解了这一点，我们是否可以这样做，即：<strong>“用户想看哪一页的数据，我就只去后台数据库查询这一页的数据。”</strong> 有了这样的理解，下来就是具体操作了。这个思路其实类似与Python语法中列表的<strong>切片</strong>功能，例如：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>test_list</span> <span class=o>=</span> <span class=p>[</span><span class=mi>1</span><span class=p>,</span> <span class=mi>3</span><span class=p>,</span> <span class=mi>4</span><span class=p>,</span> <span class=mi>5</span><span class=p>,</span> <span class=mi>6</span><span class=p>,</span> <span class=mi>7</span><span class=p>,</span> <span class=mi>8</span><span class=p>,</span> <span class=mi>9</span><span class=p>,</span> <span class=mi>10</span><span class=p>,</span> <span class=mi>11</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=c1># 测试我们只需要这个列表中第3个到6个这4条数据，那么用列表的切片</span>
+</span></span><span class=line><span class=cl><span class=n>little_list</span> <span class=o>=</span> <span class=n>test_list</span><span class=p>[</span><span class=mi>2</span><span class=p>:</span><span class=mi>6</span><span class=p>]</span>
+</span></span></code></pre></td></tr></table></div></div><p>要查询到某一页展示的数据是哪些，必须知道这一页的数据的对应的数据起始位置和结束位置。
+恰好在DataTables中，每次用户点击翻页（上一页或下一页）按钮时，<strong>前端都会向后端发送一次ajax请求。</strong> 而这次请求，前端则会将这一页的起始位置与结束位置传递到后端。
+下面上代码：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-html data-lang=html><span class=line><span class=cl><span class=p>&lt;</span><span class=nt>table</span> <span class=na>id</span><span class=o>=</span><span class=s>&#34;basic-table&#34;</span> <span class=na>class</span><span class=o>=</span><span class=s>&#34;table table-hover&#34;</span> <span class=na>width</span><span class=o>=</span><span class=s>&#34;100%&#34;</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=p>&lt;</span><span class=nt>thead</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>        <span class=p>&lt;</span><span class=nt>tr</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>            <span class=p>&lt;</span><span class=nt>th</span><span class=p>&gt;</span>学号<span class=p>&lt;/</span><span class=nt>th</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>            <span class=p>&lt;</span><span class=nt>th</span><span class=p>&gt;</span>姓名<span class=p>&lt;/</span><span class=nt>th</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>            <span class=p>&lt;</span><span class=nt>th</span><span class=p>&gt;</span>年龄<span class=p>&lt;/</span><span class=nt>th</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>        <span class=p>&lt;/</span><span class=nt>tr</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=p>&lt;/</span><span class=nt>thead</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=p>&lt;</span><span class=nt>tbody</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=p>&lt;/</span><span class=nt>tbody</span><span class=p>&gt;</span>
+</span></span><span class=line><span class=cl><span class=p>&lt;/</span><span class=nt>table</span><span class=p>&gt;</span>
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span><span class=lnt>69
+</span><span class=lnt>70
+</span><span class=lnt>71
+</span><span class=lnt>72
+</span><span class=lnt>73
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-javascript data-lang=javascript><span class=line><span class=cl>    <span class=nx>$</span><span class=p>(</span><span class=nb>document</span><span class=p>).</span><span class=nx>ready</span><span class=p>(</span><span class=kd>function</span> <span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=c1>//django post请求需要加认证，不能忘了
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nx>$</span><span class=p>.</span><span class=nx>ajaxSetup</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>            <span class=nx>data</span><span class=o>:</span> <span class=p>{</span><span class=nx>csrfmiddlewaretoken</span><span class=o>:</span> <span class=s1>&#39;{{ csrf_token }}&#39;</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=kd>var</span> <span class=nx>table</span> <span class=o>=</span> <span class=nx>$</span><span class=p>(</span><span class=s1>&#39;#backend-table&#39;</span><span class=p>).</span><span class=nx>DataTable</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>            <span class=s2>&#34;pagingType&#34;</span><span class=o>:</span> <span class=s2>&#34;full_numbers&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=c1>// 跟基本使用对比，已经没有data属性，而是多了&#34;ajax&#34;
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=nx>searching</span><span class=o>:</span> <span class=kc>false</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nx>destroy</span><span class=o>:</span> <span class=kc>true</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nx>stateSave</span><span class=o>:</span> <span class=kc>true</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=c1>// 此处为ajax向后端请求的网址
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=nx>sAjaxSource</span><span class=o>:</span> <span class=s2>&#34;{% url &#39;example:request_backend&#39; %}&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=s2>&#34;processing&#34;</span><span class=o>:</span> <span class=kc>false</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=s2>&#34;serverSide&#34;</span><span class=o>:</span> <span class=kc>true</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=s2>&#34;bPaginate&#34;</span> <span class=o>:</span> <span class=kc>true</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=s2>&#34;bInfo&#34;</span> <span class=o>:</span> <span class=kc>true</span><span class=p>,</span> <span class=c1>//是否显示页脚信息，DataTables插件左下角显示记录数
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=s2>&#34;sDom&#34;</span><span class=o>:</span> <span class=s2>&#34;t&lt;&#39;row-fluid&#39;&lt;&#39;span6&#39;i&gt;&lt;&#39;span6&#39;p&gt;&gt;&#34;</span><span class=p>,</span><span class=c1>//定义表格的显示方式
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=c1>//服务器端，数据回调处理
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=s2>&#34;fnServerData&#34;</span> <span class=o>:</span> <span class=kd>function</span><span class=p>(</span><span class=nx>sSource</span><span class=p>,</span> <span class=nx>aoData</span><span class=p>,</span> <span class=nx>fnCallback</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=nx>$</span><span class=p>.</span><span class=nx>ajax</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>                    <span class=s2>&#34;dataType&#34;</span> <span class=o>:</span> <span class=s1>&#39;json&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=c1>// 此处用post，推荐用post形式，get也可以，但可能会遇到坑
+</span></span></span><span class=line><span class=cl><span class=c1></span>                    <span class=s2>&#34;type&#34;</span> <span class=o>:</span> <span class=s2>&#34;post&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=s2>&#34;url&#34;</span> <span class=o>:</span> <span class=nx>sSource</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=s2>&#34;data&#34;</span> <span class=o>:</span> <span class=nx>aoData</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=s2>&#34;success&#34;</span> <span class=o>:</span> <span class=kd>function</span><span class=p>(</span><span class=nx>resp</span><span class=p>){</span>
+</span></span><span class=line><span class=cl>                        <span class=nx>fnCallback</span><span class=p>(</span><span class=nx>resp</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>                    <span class=p>}</span>
+</span></span><span class=line><span class=cl>                <span class=p>});</span>
+</span></span><span class=line><span class=cl>            <span class=p>},</span>
+</span></span><span class=line><span class=cl>            <span class=c1>// ajax请求成功传递回来后数据的展示
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=nx>columns</span><span class=o>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>               <span class=p>{</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>data</span><span class=o>:</span> <span class=kc>null</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>width</span><span class=o>:</span> <span class=s2>&#34;1%&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=c1>// 若想前端显示的不一样，则需要&#34;render&#34;函数
+</span></span></span><span class=line><span class=cl><span class=c1></span>                    <span class=s1>&#39;render&#39;</span><span class=o>:</span> <span class=kd>function</span> <span class=p>(</span><span class=nx>data</span><span class=p>,</span> <span class=nx>type</span><span class=p>,</span> <span class=nx>full</span><span class=p>,</span> <span class=nx>meta</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                        <span class=k>return</span> <span class=nx>meta</span><span class=p>.</span><span class=nx>row</span> <span class=o>+</span> <span class=mi>1</span> <span class=o>+</span> <span class=nx>meta</span><span class=p>.</span><span class=nx>settings</span><span class=p>.</span><span class=nx>_iDisplayStart</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>                    <span class=p>}</span>
+</span></span><span class=line><span class=cl>                <span class=p>},</span>
+</span></span><span class=line><span class=cl>                <span class=p>{</span>
+</span></span><span class=line><span class=cl>                    <span class=nx>data</span><span class=o>:</span> <span class=s2>&#34;name&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=s1>&#39;render&#39;</span><span class=o>:</span> <span class=kd>function</span> <span class=p>(</span><span class=nx>data</span><span class=p>,</span> <span class=nx>type</span><span class=p>,</span> <span class=nx>full</span><span class=p>,</span> <span class=nx>meta</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                        <span class=k>return</span> <span class=s1>&#39;&lt;a class=&#34;text-warning&#34; style=&#34;color:#007bff&#34; title=&#34;年龄为&#39;</span><span class=o>+</span> <span class=nx>full</span><span class=p>.</span><span class=nx>age</span> <span class=o>+</span><span class=s1>&#39;&#34;&gt;&#39;</span><span class=o>+</span> <span class=nx>data</span> <span class=o>+</span><span class=s1>&#39;&lt;/a&gt;&#39;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>                    <span class=p>}</span>
+</span></span><span class=line><span class=cl>                <span class=p>},</span>
+</span></span><span class=line><span class=cl>                <span class=p>{</span><span class=nx>data</span><span class=o>:</span> <span class=s1>&#39;age&#39;</span><span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=p>],</span>
+</span></span><span class=line><span class=cl>            <span class=s2>&#34;language&#34;</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;processing&#34;</span><span class=o>:</span> <span class=s2>&#34;正在获取数据，请稍后...&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;lengthMenu&#34;</span><span class=o>:</span> <span class=s2>&#34;选择每页 _MENU_ 展示 &#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;zeroRecords&#34;</span><span class=o>:</span> <span class=s2>&#34;未找到匹配结果--抱歉&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;info&#34;</span><span class=o>:</span> <span class=s2>&#34;当前显示第 _PAGE_ 页结果，共 _PAGES_ 页, 共 _TOTAL_ 条记录&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;infoEmpty&#34;</span><span class=o>:</span> <span class=s2>&#34;没有数据&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;infoFiltered&#34;</span><span class=o>:</span> <span class=s2>&#34;(获取 _MAX_ 项结果)&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;sLoadingRecords&#34;</span><span class=o>:</span> <span class=s2>&#34;载入中...&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;paginate&#34;</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                    <span class=s2>&#34;first&#34;</span><span class=o>:</span> <span class=s2>&#34;首页&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=s2>&#34;previous&#34;</span><span class=o>:</span> <span class=s2>&#34;上一页&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=s2>&#34;next&#34;</span><span class=o>:</span> <span class=s2>&#34;下一页&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=s2>&#34;last&#34;</span><span class=o>:</span> <span class=s2>&#34;末页&#34;</span>
+</span></span><span class=line><span class=cl>                <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span> <span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// 每隔5秒刷新一次数据
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=c1>// setInterval(refresh, 5000);
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=p>});</span>
+</span></span><span class=line><span class=cl>    <span class=kd>function</span> <span class=nx>refresh</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=kd>var</span> <span class=nx>table</span> <span class=o>=</span> <span class=nx>$</span><span class=p>(</span><span class=s1>&#39;#backend-table&#39;</span><span class=p>).</span><span class=nx>DataTable</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>        <span class=nx>table</span><span class=p>.</span><span class=nx>ajax</span><span class=p>.</span><span class=nx>reload</span><span class=p>(</span><span class=kc>null</span><span class=p>,</span> <span class=kc>false</span><span class=p>);</span> <span class=c1>// 刷新表格数据，分页信息不会重置
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>后端代码：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># 暂时跳过csrf的保护</span>
+</span></span><span class=line><span class=cl><span class=nd>@csrf_exempt</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>request_backend</span><span class=p>(</span><span class=n>request</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>    处理后端分页例子中的post请求
+</span></span></span><span class=line><span class=cl><span class=s2>    :param request:
+</span></span></span><span class=line><span class=cl><span class=s2>    :return:
+</span></span></span><span class=line><span class=cl><span class=s2>    &#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=k>try</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=n>request</span><span class=o>.</span><span class=n>method</span> <span class=o>==</span> <span class=s2>&#34;POST&#34;</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=c1># 获取翻页后该页要展示多少条数据。默认为10；此时要是不清楚dataTables的ajax的post返回值</span>
+</span></span><span class=line><span class=cl>            <span class=c1># 可以打印一下看看print(request.POST)</span>
+</span></span><span class=line><span class=cl>            <span class=n>page_length</span> <span class=o>=</span> <span class=nb>int</span><span class=p>(</span><span class=n>request</span><span class=o>.</span><span class=n>POST</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=s1>&#39;iDisplayLength&#39;</span><span class=p>,</span> <span class=s1>&#39;10&#39;</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>            <span class=c1># 该字典将转化为json格式的数据返回给前端，字典中的key默认的名字不能变</span>
+</span></span><span class=line><span class=cl>            <span class=n>rest</span> <span class=o>=</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=s2>&#34;iTotalRecords&#34;</span><span class=p>:</span> <span class=n>page_length</span><span class=p>,</span>  <span class=c1># 本次加载记录数量</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=c1># 获取传递过来的该页的起始位置，第一页的起始位置为0.</span>
+</span></span><span class=line><span class=cl>            <span class=n>page_start</span> <span class=o>=</span> <span class=nb>int</span><span class=p>(</span><span class=n>request</span><span class=o>.</span><span class=n>POST</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=s1>&#39;iDisplayStart&#39;</span><span class=p>,</span> <span class=s1>&#39;0&#39;</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>            <span class=c1># 该页的结束位置则就是&#34;开始的值 + 该页的长度&#34;</span>
+</span></span><span class=line><span class=cl>            <span class=n>page_end</span> <span class=o>=</span> <span class=n>page_start</span> <span class=o>+</span> <span class=n>page_length</span>
+</span></span><span class=line><span class=cl>            <span class=c1># 开始查询数据库，只请求这两个位置之间的数据</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>            <span class=n>users</span> <span class=o>=</span> <span class=n>User</span><span class=o>.</span><span class=n>objects</span><span class=o>.</span><span class=n>all</span><span class=p>()[</span><span class=n>page_start</span><span class=p>:</span><span class=n>page_end</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>            <span class=n>total_length</span> <span class=o>=</span> <span class=n>User</span><span class=o>.</span><span class=n>objects</span><span class=o>.</span><span class=n>all</span><span class=p>()</span><span class=o>.</span><span class=n>count</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>            <span class=n>user_list</span> <span class=o>=</span> <span class=p>[]</span>
+</span></span><span class=line><span class=cl>            <span class=k>for</span> <span class=n>user_info</span> <span class=ow>in</span> <span class=n>users</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                <span class=n>user_list</span><span class=o>.</span><span class=n>append</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>                    <span class=s1>&#39;name&#39;</span><span class=p>:</span> <span class=n>user_info</span><span class=o>.</span><span class=n>name</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                    <span class=s1>&#39;age&#39;</span><span class=p>:</span> <span class=n>user_info</span><span class=o>.</span><span class=n>age</span>
+</span></span><span class=line><span class=cl>                <span class=p>})</span>
+</span></span><span class=line><span class=cl>            <span class=c1># print(start, &#34;:&#34;, length, &#34;:&#34;, draw)</span>
+</span></span><span class=line><span class=cl>            <span class=c1># 此时的key名字就是aaData，不能变</span>
+</span></span><span class=line><span class=cl>            <span class=n>rest</span><span class=p>[</span><span class=s1>&#39;aaData&#39;</span><span class=p>]</span> <span class=o>=</span> <span class=n>user_list</span>
+</span></span><span class=line><span class=cl>            <span class=c1># 总记录数量</span>
+</span></span><span class=line><span class=cl>            <span class=n>rest</span><span class=p>[</span><span class=s1>&#39;iTotalDisplayRecords&#39;</span><span class=p>]</span> <span class=o>=</span> <span class=n>total_length</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=n>HttpResponse</span><span class=p>(</span><span class=n>json</span><span class=o>.</span><span class=n>dumps</span><span class=p>(</span><span class=n>rest</span><span class=p>),</span> <span class=n>content_type</span><span class=o>=</span><span class=s2>&#34;application/json&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=n>HttpResponse</span><span class=p>(</span><span class=sa>f</span><span class=s1>&#39;非法请求方式&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>except</span> <span class=ne>Exception</span> <span class=k>as</span> <span class=n>e</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>HttpResponse</span><span class=p>(</span><span class=n>e</span><span class=o>.</span><span class=n>args</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>如果我们想让前端实现定时刷新，可以用js的<strong>setInterval</strong>方法。具体如下：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-javascript data-lang=javascript><span class=line><span class=cl><span class=kd>function</span> <span class=nx>refresh</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=kd>var</span> <span class=nx>table</span> <span class=o>=</span> <span class=nx>$</span><span class=p>(</span><span class=s1>&#39;#backend-table&#39;</span><span class=p>).</span><span class=nx>DataTable</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>        <span class=nx>table</span><span class=p>.</span><span class=nx>ajax</span><span class=p>.</span><span class=nx>reload</span><span class=p>(</span><span class=kc>null</span><span class=p>,</span> <span class=kc>false</span><span class=p>);</span> <span class=c1>// 刷新表格数据，分页信息不会重置
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=c1>// 每隔5秒刷新一次数据
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nx>setInterval</span><span class=p>(</span><span class=nx>refresh</span><span class=p>,</span> <span class=mi>5000</span><span class=p>);</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=最后>最后</h2><p>以上的还有好多的dataTables插件的方法没有使用到，<a href=https://datatables.net/examples/basic_init/zero_configuration.html target=_blank rel="noopener noreffer">官网</a>有很多的使用事例，也非常详细，此处也只是把常用到的进行了归纳。这里多说一句，关于ajax请求后DataTables默认的查询会不起作用，但它会将查询框中的text通过ajax返回，需要自己在后端进行处理。
+以上内容若有错误，请及时指正哈！</p></div><div class=post-footer id=post-footer><div class=post-info><div class=post-info-line><div class=post-info-mod><span>更新于 2018-09-15</span></div><div class=post-info-license></div></div><div class=post-info-line><div class=post-info-md></div><div class=post-info-share><span><a href=# onclick=return!1 title="分享到 Twitter" data-sharer=twitter data-url=https://www.geekby.cn/django-datatables/ data-title=Django使用DataTables插件总结 data-via=@geekby1024 data-hashtags=Django,DataTables><i class="fab fa-twitter fa-fw"></i></a><a href=# onclick=return!1 title="分享到 微博" data-sharer=weibo data-url=https://www.geekby.cn/django-datatables/ data-title=Django使用DataTables插件总结 data-image=https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/django-datatables.4s58ppjmua60.png data-ralateuid=u/5101801783><i class="fab fa-weibo fa-fw"></i></a></span></div></div></div><div class=post-info-more><section class=post-tags><i class="fas fa-tags fa-fw"></i>&nbsp;<a href=/tags/django/>Django</a>,&nbsp;<a href=/tags/datatables/>DataTables</a></section><section><span><a href=# onclick=window.history.back()>返回</a></span>&nbsp;|&nbsp;<span><a href=/>主页</a></span></section></div><div class=post-nav><a href=/python-grpc/ class=prev rel=prev title=基于grpc的流式方式实现双向通讯(python)><i class="fas fa-angle-left fa-fw"></i>基于grpc的流式方式实现双向通讯(python)</a>
+<a href=/python-tfs/ class=next rel=next title="python操作TFS的Work Item">python操作TFS的Work Item<i class="fas fa-angle-right fa-fw"></i></a></div></div><div id=comments><div id=waline class=comment></div><noscript>Please enable JavaScript to view the comments powered by <a href=https://waline.js.org/>Waline</a>.</noscript></div></article></div></main><footer class=footer><div class=footer-container><div class=footer-line>由 <a href=https://gohugo.io/ target=_blank rel="noopener noreffer" title="Hugo 0.110.0">Hugo</a> 强力驱动 | 主题 - <a href=https://github.com/HEIGE-PCloud/DoIt target=_blank rel="noopener noreffer" title="DoIt 0.2.10"><i class="far fa-edit fa-fw"></i> DoIt</a></div><div class=footer-line><i class="far fa-copyright fa-fw"></i><span itemprop=copyrightYear>2020 - 2023</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=https://github.com/jackbai233 target=_blank rel="noopener noreferrer">JackBai</a></span>&nbsp;|&nbsp;<span class=license><a rel="license external nofollow noopener noreffer" href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank>CC BY-NC 4.0</a></span><span class=icp-splitter>&nbsp;|&nbsp;</span><br class=icp-br><span class=icp><a href=https://beian.miit.gov.cn/ target=_blank>陕ICP备2020013535号-2</a></span></div></div></footer></div><div id=fixed-buttons><a href=#back-to-top id=back-to-top-button class=fixed-button title=回到顶部><i class="fas fa-arrow-up fa-fw"></i>
+</a><a href=# id=view-comments class=fixed-button title=查看评论><i class="fas fa-comment fa-fw"></i></a></div><div class=assets><script type=text/javascript src=/lib/autocomplete/autocomplete.min.js></script><script type=text/javascript src=/lib/fuse/fuse.min.js></script><script type=text/javascript src=/lib/lazysizes/lazysizes.min.js></script><script type=text/javascript src=/lib/topbar/topbar.min.js></script><script type=text/javascript src=/lib/pjax/pjax.min.js></script><script type=text/javascript src=/js/theme.min.js></script></div><div class=pjax-assets><script type=text/javascript src=/lib/waline/Waline.min.js></script><script type=text/javascript src=/lib/lightgallery/lightgallery.min.js></script><script type=text/javascript src=/lib/lightgallery/lg-thumbnail.min.js></script><script type=text/javascript src=/lib/lightgallery/lg-zoom.min.js></script><script type=text/javascript src=/lib/clipboard/clipboard.min.js></script><script type=text/javascript src=/lib/sharer/sharer.min.js></script><script type=text/javascript src=/lib/katex/katex.min.js></script><script type=text/javascript src=/lib/katex/auto-render.min.js></script><script type=text/javascript src=/lib/katex/copy-tex.min.js></script><script type=text/javascript src=/lib/katex/mhchem.min.js></script><script type=text/javascript>window.config={code:{copyTitle:"复制到剪贴板",maxShownLines:20},comment:{waline:{copyright:!0,dark:"body[theme='dark'], body[theme='black']",el:"#waline",emoji:["https://cdn.jsdelivr.net/gh/walinejs/emojis/weibo","https://cdn.jsdelivr.net/gh/walinejs/emojis@1.0.0/bilibili"],highlight:!0,lang:"zh-cn",login:"enable",meta:["nick","mail","link"],pageSize:10,serverURL:"https://geekby-comment-gof863phj-jackbai233.vercel.app/",visitor:!0}},lightGallery:{actualSize:!1,exThumbImage:"data-thumbnail",hideBarsDelay:2e3,selector:".lightgallery",speed:400,thumbContHeight:80,thumbWidth:80,thumbnail:!0},math:{delimiters:[{display:!0,left:"$$",right:"$$"},{display:!0,left:"\\[",right:"\\]"},{display:!1,left:"$",right:"$"},{display:!1,left:"\\(",right:"\\)"}],strict:!1},search:{distance:100,findAllMatches:!1,fuseIndexURL:"/index.json",highlightTag:"em",ignoreFieldNorm:!1,ignoreLocation:!1,isCaseSensitive:!1,location:0,maxResultLength:10,minMatchCharLength:2,noResultsFound:"没有找到结果",snippetLength:50,threshold:.3,type:"fuse",useExtendedSearch:!1},sharerjs:!0}</script><link rel=stylesheet href=/lib/lightgallery/lightgallery.min.css><link rel=stylesheet href=/lib/katex/katex.min.css><link rel=stylesheet href=/lib/katex/copy-tex.min.css></div></body></html>
