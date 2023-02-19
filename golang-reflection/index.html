@@ -1,0 +1,245 @@
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="noodp"><title class=pjax-title>Go 语言反射 - geekbyの自留地</title><meta name=Description content="这篇文章讲述了 Go 语言中反射(Reflection)的使用方法和原理."><meta property="og:title" content="Go 语言反射"><meta property="og:description" content="这篇文章讲述了 Go 语言中反射(Reflection)的使用方法和原理."><meta property="og:type" content="article"><meta property="og:url" content="https://www.geekby.cn/golang-reflection/"><meta property="og:image" content="https://www.geekby.cn/images/avatar.png"><meta property="article:section" content="posts"><meta property="article:published_time" content="2023-02-19T16:45:59+08:00"><meta property="article:modified_time" content="2023-02-19T16:45:59+08:00"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://www.geekby.cn/images/avatar.png"><meta name=twitter:title content="Go 语言反射"><meta name=twitter:description content="这篇文章讲述了 Go 语言中反射(Reflection)的使用方法和原理."><meta name=application-name content="geekby"><meta name=apple-mobile-web-app-title content="geekby"><meta name=theme-color content="#f8f8f8"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=canonical href=https://www.geekby.cn/golang-reflection/><link rel=prev href=https://www.geekby.cn/nginx-404-static-problem/><link rel=stylesheet href=/lib/normalize/normalize.min.css><link rel=stylesheet href=/css/style.min.css><link rel=preload as=style onload='this.onload=null,this.rel="stylesheet"' href=/lib/fontawesome-free/all.min.css><noscript><link rel=stylesheet href=/lib/fontawesome-free/all.min.css></noscript><link rel=preload as=style onload='this.onload=null,this.rel="stylesheet"' href=/lib/animate/animate.min.css><noscript><link rel=stylesheet href=/lib/animate/animate.min.css></noscript><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"Go 语言反射","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/www.geekby.cn\/golang-reflection\/"},"genre":"posts","keywords":"Golang","wordcount":3473,"url":"https:\/\/www.geekby.cn\/golang-reflection\/","datePublished":"2023-02-19T16:45:59+08:00","dateModified":"2023-02-19T16:45:59+08:00","publisher":{"@type":"Organization","name":""},"author":{"@type":"Person","name":"JackBai"},"description":"这篇文章讲述了 Go 语言中反射(Reflection)的使用方法和原理."}</script></head><body header-desktop=fixed header-mobile=auto><script type=text/javascript>function setTheme(e){document.body.setAttribute("theme",e)}function saveTheme(e){window.localStorage&&localStorage.setItem("theme",e)}function getMeta(e){const t=document.getElementsByTagName("meta");for(let n=0;n<t.length;n++)if(t[n].getAttribute("name")===e)return t[n];return""}if(window.localStorage&&localStorage.getItem("theme")){let e=localStorage.getItem("theme");e==="light"||e==="dark"||e==="black"?setTheme(e):setTheme(window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")}else"auto"==="light"||"auto"==="dark"||"auto"==="black"?(setTheme("auto"),saveTheme("auto")):(saveTheme("auto"),setTheme(window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"));let metaColors={light:"#f8f8f8",dark:"#252627",black:"#000000"};getMeta("theme-color").content=metaColors[document.body.getAttribute("theme")]</script><div id=back-to-top></div><div id=mask></div><div class=wrapper><header class=desktop id=header-desktop><div class=header-wrapper><div class=header-title><a href=/ title=geekbyの自留地>geekbyの自留地</a></div><div class=menu><div class=menu-inner><a class=menu-item href=/posts/>文章 </a><a class=menu-item href=/tags/>标签 </a><a class=menu-item href=/categories/>分类 </a><a class=menu-item href=/about/>关于 </a><a class=menu-item href=https://github.com/jackbai233 title=Github rel="noopener noreffer" target=_blank><i class='fab fa-github fa-fw'></i> </a><span class="menu-item delimiter"></span><span class="menu-item search" id=search-desktop>
+<input type=text placeholder=搜索文章标题或内容... id=search-input-desktop>
+<a href=# onclick=return!1 class="search-button search-toggle" id=search-toggle-desktop title=搜索><i class="fas fa-search fa-fw"></i></a>
+<a href=# onclick=return!1 class="search-button search-clear" id=search-clear-desktop title=清空><i class="fas fa-times-circle fa-fw"></i></a>
+<span class="search-button search-loading" id=search-loading-desktop><i class="fas fa-spinner fa-fw fa-spin"></i></span>
+</span><a href=# onclick=return!1 class="menu-item theme-switch" title=切换主题><i class="fas fa-adjust fa-fw"></i></a></div></div></div></header><header class=mobile id=header-mobile><div class=header-container><div class=header-wrapper><div class=header-title><a href=/ title=geekbyの自留地>geekbyの自留地</a></div><div class=menu-toggle id=menu-toggle-mobile><span></span><span></span><span></span></div></div><div class=menu id=menu-mobile><div class=search-wrapper><div class="search mobile" id=search-mobile><input type=text placeholder=搜索文章标题或内容... id=search-input-mobile>
+<a href=# onclick=return!1 class="search-button search-toggle" id=search-toggle-mobile title=搜索><i class="fas fa-search fa-fw"></i></a>
+<a href=# onclick=return!1 class="search-button search-clear" id=search-clear-mobile title=清空><i class="fas fa-times-circle fa-fw"></i></a>
+<span class="search-button search-loading" id=search-loading-mobile><i class="fas fa-spinner fa-fw fa-spin"></i></span></div><a href=# onclick=return!1 class=search-cancel id=search-cancel-mobile>取消</a></div><a class=menu-item href=/posts/ title>文章</a><a class=menu-item href=/tags/ title>标签</a><a class=menu-item href=/categories/ title>分类</a><a class=menu-item href=/about/ title>关于</a><a class=menu-item href=https://github.com/jackbai233 title=Github rel="noopener noreffer" target=_blank><i class='fab fa-github fa-fw'></i></a><a href=# onclick=return!1 class="menu-item theme-switch" title=切换主题>
+<i class="fas fa-adjust fa-fw"></i></a></div></div></header><div class="search-dropdown desktop"><div id=search-dropdown-desktop></div></div><div class="search-dropdown mobile"><div id=search-dropdown-mobile></div></div><main class=main><div class=container><div class=toc id=toc-auto><h2 class=toc-title>目录</h2><div class=toc-content id=toc-content-auto></div></div><script>document.getElementsByTagName("main")[0].setAttribute("pageStyle","normal")</script><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC","true")</script><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Go 语言反射</h1><div class=post-meta><div class=post-meta-line><span class=post-author><i class="author fas fa-user-circle fa-fw"></i><a href=https://www.geekby.cn title=Author target=_blank rel="noopener noreffer author" class=author>JackBai</a>
+</span>&nbsp;<span class=post-category>收录于 </span>&nbsp;<span class=post-category>类别 <a href=/categories/%E5%90%8E%E7%AB%AF/><i class="far fa-folder fa-fw"></i>后端</a></span></div><div class=post-meta-line><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime=2023-02-19>2023-02-19</time>&nbsp;<i class="far fa-edit fa-fw"></i>&nbsp;<time datetime=2023-02-19>2023-02-19</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 3473 字&nbsp;
+<i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 7 分钟&nbsp;<span id=/golang-reflection/ class=leancloud_visitors data-flag-title="Go 语言反射">
+<i class="far fa-eye fa-fw"></i>&nbsp;<span class=leancloud-visitors-count></span>&nbsp;次阅读
+</span>&nbsp;<span id=/golang-reflection/ class=comment_count data-flag-title="Go 语言反射">
+<i class="far fa-comments fa-fw"></i>&nbsp;<span class=waline-comment-count id=waline-comment-count></span>&nbsp;条评论
+</span>&nbsp;</div></div><div class=featured-image><img class=lazyload data-src=https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/go-reflection.6nfnjggh93w0.webp data-srcset="https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/go-reflection.6nfnjggh93w0.webp, https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/go-reflection.6nfnjggh93w0.webp 1.5x, https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/go-reflection.6nfnjggh93w0.webp 2x" data-sizes=auto alt=https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/go-reflection.6nfnjggh93w0.webp title="这篇文章讲述了 Go 语言中反射(Reflection)的使用方法和原理." height=auto width=auto></div><div class="details toc" id=toc-static kept><div class="details-summary toc-title"><span>目录</span>
+<span><i class="details-icon fas fa-angle-right"></i></span></div><div class="details-content toc-content" id=toc-content-static><nav id=TableOfContents><ul><li><a href=#定义>定义</a></li><li><a href=#理解>理解</a><ul><li><a href=#类型>类型</a></li><li><a href=#接口>接口</a></li><li><a href=#反射>反射</a><ul><li><ul><li><a href=#1-基本使用>1. 基本使用</a></li><li><a href=#2-从反射回到接口值>2. 从反射回到接口值</a></li><li><a href=#3-要修改反射对象值必须是可设置的>3. 要修改反射对象，值必须是可设置的</a></li></ul></li></ul></li></ul></li><li><a href=#参考>参考</a></li></ul></nav></div></div><div class=content id=content><p>这篇文章讲述了Go 语言中反射(Reflection)的使用方法以及为什么要使用反射等内容.</p><h1 id=golang-反射学习>Golang 反射学习</h1><h2 id=定义>定义</h2><p>从<a href=https://book.itsfun.top/gopl-zh/ch12/ch12.html target=_blank rel="noopener noreffer">《go程序设计语言》</a>了解到，在 go 语言中，反射是一种 <strong>机制</strong>。具体如下：</p><blockquote><p>反射能在运行时更新变量和检查它们的值、调用它们的方法和它们支持的内在操作，而不需要在编译时就知道变量的具体类型。</p></blockquote><p>从上面的描述可以大概理出如下几条结论：</p><ul><li>反射作用于某种变量，该种变量的具体类型在编译时不确定。</li><li>日常使用时，当某个变量的具体类型被确定后，才能调用该具体类型的某些方法。因此，反射首先要在运行时检查到该变量的具体类型，才能进行后续操作。</li><li>在编译时不确定具体类型的变量一般是<strong>接口变量</strong>，因此可以大概理解，反射一般是作用在接口变量上的。</li></ul><h2 id=理解>理解</h2><p>要充分理解上面几条结论，需要先理解 Go 中的<strong>类型</strong>和<strong>接口</strong>知识，下面先对类型、接口进行介绍，然后再过渡到反射的相关内容。</p><h3 id=类型>类型</h3><p>我们知道 Go 是<strong>静态编译型</strong>语言。因此，每一个变量都有一个静态类型，也就是说每个变量的类型在编译时就已确定并固定。例如：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-golang data-lang=golang><span class=line><span class=cl><span class=kd>type</span> <span class=nx>MyInt</span> <span class=kt>int</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>var</span> <span class=nx>i</span> <span class=kt>int</span>
+</span></span><span class=line><span class=cl><span class=kd>var</span> <span class=nx>j</span> <span class=nx>MyInt</span>
+</span></span></code></pre></td></tr></table></div></div><p>i 的类型为 int， j 的类型为 MyInt 。变量 i 和 j 具有不同的静态类型，尽管它们具有相同的基础类型，但如果不进行转换就不能将它们赋值给彼此。</p><p>此时大家可能有疑问，既然在编译时已经确定了变量的类型，那为何在运行时还有变量的类型能变化？这不是自相矛盾吗？别急，我们接着往下看。</p><h3 id=接口>接口</h3><p>在 Go 中，接口也是一种类型。它表示一类方法的合集。<div class="details admonition tip open"><div class="details-summary admonition-title"><i class="icon fas fa-lightbulb fa-fw"></i>注意<i class="details-icon fas fa-angle-right fa-fw"></i></div><div class=details-content><div class=admonition-content>此处说的接口不涉及 go1.18 版本时为了支持泛型而重新定义的接口内容。因 go 的版本都是向后兼容的，因此无需担心下面的叙述在新版本 go 中不适用。</div></div></div></p><p>在编程中，方法一般指某种行为，因此也可以说 <strong>接口类型是对某种或某些行为的抽象和概括</strong> 。如下，我们定义<code>动物</code>这种接口：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-golang data-lang=golang><span class=line><span class=cl><span class=kn>package</span> <span class=nx>main</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=s>&#34;fmt&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>Animal</span> <span class=kd>interface</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=nf>move</span><span class=p>(</span><span class=kt>int</span><span class=p>)</span> <span class=kt>string</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>Human</span> <span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=nx>Name</span> <span class=kt>string</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>h</span> <span class=nx>Human</span><span class=p>)</span> <span class=nf>move</span><span class=p>(</span><span class=nx>n</span> <span class=kt>int</span><span class=p>)</span> <span class=kt>string</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=k>return</span> <span class=nx>fmt</span><span class=p>.</span><span class=nf>Sprintf</span><span class=p>(</span><span class=s>&#34;%s 移动了 %d 步&#34;</span><span class=p>,</span> <span class=nx>h</span><span class=p>.</span><span class=nx>Name</span><span class=p>,</span> <span class=nx>n</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>Cat</span> <span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>c</span> <span class=nx>Cat</span><span class=p>)</span> <span class=nf>move</span><span class=p>(</span><span class=nx>n</span> <span class=kt>int</span><span class=p>)</span> <span class=kt>string</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=k>return</span> <span class=nx>fmt</span><span class=p>.</span><span class=nf>Sprintf</span><span class=p>(</span><span class=s>&#34;cat 移动了 %d 步&#34;</span><span class=p>,</span> <span class=nx>n</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>AnimalMove</span><span class=p>(</span><span class=nx>animal</span> <span class=nx>Animal</span><span class=p>,</span> <span class=nx>n</span> <span class=kt>int</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=nx>fmt</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=nx>animal</span><span class=p>.</span><span class=nf>move</span><span class=p>(</span><span class=nx>n</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=nx>jack</span> <span class=o>:=</span> <span class=nx>Human</span><span class=p>{</span><span class=nx>Name</span><span class=p>:</span> <span class=s>&#34;jack&#34;</span><span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=nf>AnimalMove</span><span class=p>(</span><span class=nx>jack</span><span class=p>,</span> <span class=mi>3</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>上面代码中，<code>Human</code> 与 <code>Cat</code> 类型都实现了 <code>Animal</code> 接口类型中的抽象方法 <code>move</code>，因此 Human 类型的变量 <code>jack</code> (以及 Cat 类型的变量)都属于 Animal 接口类型的变量(go 中接口的实现是隐式的)。</p><p>因此，当将 jack 传递给 AnimalMove 方法时，此时 jack 既属于接口变量，又是类型 Human 的变量。那么我们该如何定义 jack 呢？事实上，接口的值是这样定义的:
+<strong>接口的值是由两部分构成的，一个具体的类型，和这个具体类型对应的值</strong>。 这两个部分被称为接口的<strong>动态类型</strong>和<strong>动态值</strong>(为了避免歧义，下文也称具体类型和具体值)。如下：</p><p><img class=lazyload data-src=https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/%e6%8e%a5%e5%8f%a3%e5%80%bc.54ioyxt0vag0.webp data-srcset="https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/%e6%8e%a5%e5%8f%a3%e5%80%bc.54ioyxt0vag0.webp, https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/%e6%8e%a5%e5%8f%a3%e5%80%bc.54ioyxt0vag0.webp 1.5x, https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/%e6%8e%a5%e5%8f%a3%e5%80%bc.54ioyxt0vag0.webp 2x" data-sizes=auto alt=https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/接口值.54ioyxt0vag0.webp title=接口值></p><p>此时，我们再回过头理解 <strong>Go 中变量都是静态类型的</strong> 这句话:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-golang data-lang=golang><span class=line><span class=cl><span class=c1>// Writer is the interface that wraps the basic Write method.
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>type</span> <span class=nx>Writer</span> <span class=kd>interface</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nf>Write</span><span class=p>(</span><span class=nx>p</span> <span class=p>[]</span><span class=kt>byte</span><span class=p>)</span> <span class=p>(</span><span class=nx>n</span> <span class=kt>int</span><span class=p>,</span> <span class=nx>err</span> <span class=kt>error</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>var</span> <span class=nx>x</span> <span class=nx>Writer</span>  <span class=c1>// x = nil
+</span></span></span></code></pre></td></tr></table></div></div><p>对于接口变量 x , 它的静态类型就是该接口类型(即 io.Writer)。无论 x 可能持有什么具体值(和具体类型)， x 的类型始终是 Writer 。因此它与 Go 中的变量都是静态类型的这个说法并不冲突。</p><p>接口变量的零值为nil。接口值可以使用==和!=来进行比较，它们需满足以下条件之一：</p><pre><code>- 两个接口值相等且它们都是nil
+- 它们的动态类型相同且其动态值能根据动态类型规则进行比较。也就是说如果接口的动态类型相同，但动态类型是不可比较的，如切片。那将它们进行比较就会产生 panic
+</code></pre><p>因此，接口类型是特殊的。相较于其他类型，要么是可比较的，要么是不可比较的，因此在比较接口值或包含了接口值的 聚合类型时，必须意识到潜在的 panic。</p><p>使用fmt包的<code>%T</code>动作可以获取接口值中的<strong>动态类型</strong>：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-golang data-lang=golang><span class=line><span class=cl><span class=kd>var</span> <span class=nx>w</span> <span class=nx>io</span><span class=p>.</span><span class=nx>Writer</span>
+</span></span><span class=line><span class=cl><span class=nx>fmt</span><span class=p>.</span><span class=nf>Printf</span><span class=p>(</span><span class=s>&#34;%T\n&#34;</span><span class=p>,</span> <span class=nx>w</span><span class=p>)</span> <span class=c1>// &#34;&lt;nil&gt;&#34;
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nx>w</span> <span class=p>=</span> <span class=nx>os</span><span class=p>.</span><span class=nx>Stdout</span>
+</span></span><span class=line><span class=cl><span class=nx>fmt</span><span class=p>.</span><span class=nf>Printf</span><span class=p>(</span><span class=s>&#34;%T\n&#34;</span><span class=p>,</span> <span class=nx>w</span><span class=p>)</span> <span class=c1>// &#34;*os.File&#34;
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nx>w</span> <span class=p>=</span> <span class=nb>new</span><span class=p>(</span><span class=nx>bytes</span><span class=p>.</span><span class=nx>Buffer</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nx>fmt</span><span class=p>.</span><span class=nf>Printf</span><span class=p>(</span><span class=s>&#34;%T\n&#34;</span><span class=p>,</span> <span class=nx>w</span><span class=p>)</span> <span class=c1>// &#34;*bytes.Buffer&#34;
+</span></span></span></code></pre></td></tr></table></div></div><p>类型断言用来检查的接口变量值中的动态类型与要断言的类型是否匹配：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-golang data-lang=golang><span class=line><span class=cl><span class=nx>t</span> <span class=o>:=</span> <span class=nx>i</span><span class=p>.(</span><span class=nx>T</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>如果此时 i 中的动态类型不属于 T ，那么就会产生 panic。 另外可以再加一个名为 <code>ok</code> 的 bool 类型变量来避免 panic 。如果 ok 为 true，则 t 为 类型 T 的<strong>具体值</strong>，如果 ok 为false， 则 t 为类型 T 的零值。
+需要注意的是： <strong>接口变量中总是持有具体的动态值和动态类型，而不能持有具体的值和接口类型</strong>：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-golang data-lang=golang><span class=line><span class=cl><span class=kd>var</span> <span class=nx>r</span> <span class=nx>io</span><span class=p>.</span><span class=nx>Reader</span>
+</span></span><span class=line><span class=cl><span class=nx>tty</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>os</span><span class=p>.</span><span class=nf>OpenFile</span><span class=p>(</span><span class=s>&#34;/dev/tty&#34;</span><span class=p>,</span> <span class=nx>os</span><span class=p>.</span><span class=nx>O_RDWR</span><span class=p>,</span> <span class=mi>0</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=kc>nil</span><span class=p>,</span> <span class=nx>err</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=nx>r</span> <span class=p>=</span> <span class=nx>tty</span>
+</span></span><span class=line><span class=cl><span class=c1>// 此时接口变量r的值为tty，该值的具体类型(或动态类型)为*os.File
+</span></span></span><span class=line><span class=cl><span class=c1></span>
+</span></span><span class=line><span class=cl><span class=kd>var</span> <span class=nx>w</span> <span class=nx>io</span><span class=p>.</span><span class=nx>Writer</span>
+</span></span><span class=line><span class=cl><span class=nx>w</span> <span class=p>=</span> <span class=nx>r</span><span class=p>.(</span><span class=nx>io</span><span class=p>.</span><span class=nx>Writer</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=c1>// 此时接口变量w的值也为tty，该值的具体类型为*os.File，并不是io.Writer，因为io.Writer是接口类型
+</span></span></span><span class=line><span class=cl><span class=c1>// 类型断言用来获取一个接口变量中的具体值
+</span></span></span></code></pre></td></tr></table></div></div><p>另外， Go 中规定，所有的<strong>具体类型的变量都能赋值给空接口变量</strong>：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-golang data-lang=golang><span class=line><span class=cl>	<span class=kd>var</span> <span class=nx>x</span> <span class=nx>any</span>  <span class=c1>// any是空接口的别称
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=kd>var</span> <span class=nx>i</span> <span class=kt>float64</span>
+</span></span><span class=line><span class=cl>	<span class=nx>x</span> <span class=p>=</span> <span class=nx>i</span>
+</span></span></code></pre></td></tr></table></div></div><p>接口一般被以两种方式使用：</p><ul><li><ol><li><strong>重方法</strong>：一个接口的方法表达了实现这个接口的具体类型间的相似性，但是隐藏了代码的细节和这些具体类型本身的操作。重点在于方法上，而不是具体的类型上(如文章开始的例子中 AnimalMove 方法，该方法内部只关注接口类型的 move 方法)。</li></ol></li><li><ol start=2><li><strong>可辨识联合</strong>：利用一个接口值可以持有各种具体类型值的能力，将这个接口认为是这些类型的联合。<strong>类型断言</strong>用来动态地区别这些类型，使得对每一种情况都进行不一样的处理(如类型断言、反射的使用)。</li></ol></li></ul><h3 id=反射>反射</h3><h5 id=1-基本使用>1. 基本使用</h5><p>此时再看反射定义中说的<em>变量在运行时类型会变化</em>：其实说的是接口变量中随着接口值的变化，其<strong>值中的动态类型</strong>也在变化，也就是动态类型和动态值在变化。在基本层面上，反射只是一种检查存储在接口变量中的动态类型类型和动态值的机制。</p><p>反射是靠 Go 中的 reflect 包实行的。该包中有两个类型： Type 和 Value。这两种类型允许访问接口变量中的内容。其中有两个函数( reflect.TypeOf 和 reflect.ValueOf ）用于从接口值中获取 Type 和 Value。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-golang data-lang=golang><span class=line><span class=cl><span class=kn>package</span> <span class=nx>main</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;fmt&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;reflect&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>var</span> <span class=nx>x</span> <span class=kt>float64</span> <span class=p>=</span> <span class=mf>3.4</span>
+</span></span><span class=line><span class=cl>    <span class=nx>fmt</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=s>&#34;type:&#34;</span><span class=p>,</span> <span class=nx>reflect</span><span class=p>.</span><span class=nf>TypeOf</span><span class=p>(</span><span class=nx>x</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>程序打印结果：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>type: float64
+</span></span></code></pre></td></tr></table></div></div><p><a href=https://pkg.go.dev/reflect#TypeOf target=_blank rel="noopener noreffer">Go 文档</a>中, reflect.TypeOf 的参数是一个空接口变量。因此在调用 reflect.TypeOf(x) 时， x 首先存储在一个空接口中，然后作为参数传递； reflect.TypeOf 会解压该空接口变量并获取其值中的动态类型信息。</p><p>reflect.Type 和 reflect.Value 这两种类型本身带了很多方法可以让我们检查和操作它们。一个重要的例子是 reflect.Value 的 Type 方法；另一个是 reflect.Type 和 reflect.Value 都有一个 Kind 方法，该方法返回一个常量，指示存储的值的动态类型： Uint 、 Float64 、 Slice 等等。另外， reflect.Value 上的方法如 Int 和 Float 能让我们获取存储在其中的动态值（如 int64 和 float64 ）：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-golang data-lang=golang><span class=line><span class=cl><span class=kd>var</span> <span class=nx>x</span> <span class=kt>float64</span> <span class=p>=</span> <span class=mf>3.4</span>
+</span></span><span class=line><span class=cl><span class=nx>v</span> <span class=o>:=</span> <span class=nx>reflect</span><span class=p>.</span><span class=nf>ValueOf</span><span class=p>(</span><span class=nx>x</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nx>fmt</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=s>&#34;type:&#34;</span><span class=p>,</span> <span class=nx>v</span><span class=p>.</span><span class=nf>Type</span><span class=p>())</span>
+</span></span><span class=line><span class=cl><span class=nx>fmt</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=s>&#34;kind is float64:&#34;</span><span class=p>,</span> <span class=nx>v</span><span class=p>.</span><span class=nf>Kind</span><span class=p>()</span> <span class=o>==</span> <span class=nx>reflect</span><span class=p>.</span><span class=nx>Float64</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nx>fmt</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=s>&#34;value:&#34;</span><span class=p>,</span> <span class=nx>v</span><span class=p>.</span><span class=nf>Float</span><span class=p>())</span>
+</span></span></code></pre></td></tr></table></div></div><p>打印结果：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>type: float64
+</span></span><span class=line><span class=cl>kind is float64: true
+</span></span><span class=line><span class=cl>value: 3.4
+</span></span></code></pre></td></tr></table></div></div><p>另外，反射有以下两个特性：</p><ul><li>reflect.Value 的 Int 方法返回一个 int64 ，而 SetInt 入参也是 int64</li><li>Kind 方法返回的是变量的最底层类型，而不是静态类型。如：<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-golang data-lang=golang><span class=line><span class=cl><span class=kd>type</span> <span class=nx>MyInt</span> <span class=kt>int</span>
+</span></span><span class=line><span class=cl><span class=kd>var</span> <span class=nx>x</span> <span class=nx>MyInt</span> <span class=p>=</span> <span class=mi>7</span>
+</span></span><span class=line><span class=cl><span class=nx>v</span> <span class=o>:=</span> <span class=nx>reflect</span><span class=p>.</span><span class=nf>ValueOf</span><span class=p>(</span><span class=nx>x</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div>v的 Type 方法返回的是 Myint, 而 Kind 方法返回的依然是 reflect.Int。</li></ul><h5 id=2-从反射回到接口值>2. 从反射回到接口值</h5><p>像物理反射一样，Go 中的反射也能进行逆操作。
+给定一个 reflect.Value ，我们可以使用其 Interface 方法恢复成一个接口值。实际上，该方法是将动态类型和动态值信息打包回空接口并返回：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-golang data-lang=golang><span class=line><span class=cl>	<span class=kd>var</span> <span class=nx>x</span> <span class=kt>float64</span> <span class=p>=</span> <span class=mf>3.4</span>
+</span></span><span class=line><span class=cl>	<span class=nx>v</span> <span class=o>:=</span> <span class=nx>reflect</span><span class=p>.</span><span class=nf>ValueOf</span><span class=p>(</span><span class=nx>x</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=nx>y</span> <span class=o>:=</span> <span class=nx>v</span><span class=p>.</span><span class=nf>Interface</span><span class=p>()</span> <span class=c1>// y will have type float64.
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=nx>fmt</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=nx>y</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><h5 id=3-要修改反射对象值必须是可设置的>3. 要修改反射对象，值必须是可设置的</h5><p>首先，看如下代码：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-golang data-lang=golang><span class=line><span class=cl><span class=kd>var</span> <span class=nx>x</span> <span class=kt>float64</span> <span class=p>=</span> <span class=mf>3.4</span>
+</span></span><span class=line><span class=cl><span class=nx>v</span> <span class=o>:=</span> <span class=nx>reflect</span><span class=p>.</span><span class=nf>ValueOf</span><span class=p>(</span><span class=nx>x</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nx>v</span><span class=p>.</span><span class=nf>SetFloat</span><span class=p>(</span><span class=mf>7.1</span><span class=p>)</span> <span class=c1>// Error: will panic.
+</span></span></span></code></pre></td></tr></table></div></div><p>如果运行如上代码，则会产生 panic。原因不在于 7.1 不可寻址，而是 v 不能设置(即不能寻址)，可设置性是 reflect.Value 的属性，但并非所有 reflect.Value 都拥有。reflect.Value 的 CanSet 方法可以用来检测该特性：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-golang data-lang=golang><span class=line><span class=cl><span class=kd>var</span> <span class=nx>x</span> <span class=kt>float64</span> <span class=p>=</span> <span class=mf>3.4</span>
+</span></span><span class=line><span class=cl><span class=nx>v</span> <span class=o>:=</span> <span class=nx>reflect</span><span class=p>.</span><span class=nf>ValueOf</span><span class=p>(</span><span class=nx>x</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nx>fmt</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=s>&#34;settability of v:&#34;</span><span class=p>,</span> <span class=nx>v</span><span class=p>.</span><span class=nf>CanSet</span><span class=p>())</span>
+</span></span><span class=line><span class=cl><span class=c1>// print: settability of v: false
+</span></span></span></code></pre></td></tr></table></div></div><p><strong>可设置性</strong>是反射对象是否能够修改存储在反射对象的实际变量值的属性。可设置性由反射对象是否持有原始变量内容所决定。</p><p>我们知道 go 是 <strong>值拷贝</strong>的, 就像函数传参一样，传递给形参的值实际是实参的值的一份拷贝副本。反射中的 reflect.ValueOf 方法也是如此， 因此对副本 v 进行更改并不能更改被传入的变量 x 的原始值。这对于反射来说是没有意义的。因此反射会报 panic。</p><p>如果我们想通过反射修改 x ，就必须给反射一个指向我们要修改的值的指针。例如：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-golang data-lang=golang><span class=line><span class=cl><span class=kd>var</span> <span class=nx>x</span> <span class=kt>float64</span> <span class=p>=</span> <span class=mf>3.4</span>
+</span></span><span class=line><span class=cl><span class=nx>p</span> <span class=o>:=</span> <span class=nx>reflect</span><span class=p>.</span><span class=nf>ValueOf</span><span class=p>(</span><span class=o>&amp;</span><span class=nx>x</span><span class=p>)</span> <span class=c1>// Note: take the address of x.
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nx>fmt</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=s>&#34;type of p:&#34;</span><span class=p>,</span> <span class=nx>p</span><span class=p>.</span><span class=nf>Type</span><span class=p>())</span>
+</span></span><span class=line><span class=cl><span class=nx>fmt</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=s>&#34;settability of p:&#34;</span><span class=p>,</span> <span class=nx>p</span><span class=p>.</span><span class=nf>CanSet</span><span class=p>())</span>
+</span></span></code></pre></td></tr></table></div></div><p>打印结果：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>type of p: *float64
+</span></span><span class=line><span class=cl>settability of p: false
+</span></span></code></pre></td></tr></table></div></div><p>此时我们很纳闷。我已经传入了 x 的指针了，为什么还不能更改。其实仔细想一下，在这里，我们的意图是为了修改 x 的值，而不是修改 x 的地址。因此 p 在这里代表的是 x 的地址，我们实际需要的是 <code>*p</code>,因此为了获取 p 实际指向的内容，需要再调用 reflect.Value 的 <code>Elem</code> 方法。它通过指针间接访问结果，并将结果保存在名为 v 的反射 reflect.Value 中：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>v := p.Elem()
+</span></span><span class=line><span class=cl>fmt.Println(&#34;settability of v:&#34;, v.CanSet())
+</span></span></code></pre></td></tr></table></div></div><p>现在 v 是一个可设置的反射对象，打印结果如下：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>settability of v: true
+</span></span></code></pre></td></tr></table></div></div><p>因为 v 代表 x ，我们终于可以使用 v.SetFloat 来修改 x 的值了：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-golang data-lang=golang><span class=line><span class=cl><span class=nx>v</span><span class=p>.</span><span class=nf>SetFloat</span><span class=p>(</span><span class=mf>7.1</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nx>fmt</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=nx>v</span><span class=p>.</span><span class=nf>Interface</span><span class=p>())</span>
+</span></span><span class=line><span class=cl><span class=nx>fmt</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=nx>x</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>打印结果：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>7.1
+</span></span><span class=line><span class=cl>7.1
+</span></span></code></pre></td></tr></table></div></div><p>另外， 如果 x 是一个结构体变量的话，如果要对结果体中的字段进行更改，那么该字段必须是可导出的(即字段首字母大写)。</p><p>以上就是关于反射的理解和基本使用了，关于反射的更多用法，请参考 <a href=https://book.itsfun.top/gopl-zh/ch12/ch12-04.html target=_blank rel="noopener noreffer">《go 程序设计语言》</a>中的示例。</p><p>码字不易，请尊重原创。如需转载，请标明出处 😄！</p><h2 id=参考>参考</h2><ol><li><a href=https://go.dev/blog/laws-of-reflection target=_blank rel="noopener noreffer">laws-of-reflection</a></li><li><a href=https://book.itsfun.top/gopl-zh/ch12/ch12.html target=_blank rel="noopener noreffer">go 程序设计语言&ndash;反射</a></li></ol></div><div class=post-footer id=post-footer><div class=post-info><div class=post-info-line><div class=post-info-mod><span>更新于 2023-02-19</span></div><div class=post-info-license></div></div><div class=post-info-line><div class=post-info-md></div><div class=post-info-share><span><a href=# onclick=return!1 title="分享到 Twitter" data-sharer=twitter data-url=https://www.geekby.cn/golang-reflection/ data-title="Go 语言反射" data-via=@geekby1024 data-hashtags=Golang><i class="fab fa-twitter fa-fw"></i></a><a href=# onclick=return!1 title="分享到 微博" data-sharer=weibo data-url=https://www.geekby.cn/golang-reflection/ data-title="Go 语言反射" data-image=https://cdn.staticaly.com/gh/jackbai233/image-hosting@master/20211024/go-reflection.6nfnjggh93w0.webp data-ralateuid=u/5101801783><i class="fab fa-weibo fa-fw"></i></a></span></div></div></div><div class=post-info-more><section class=post-tags><i class="fas fa-tags fa-fw"></i>&nbsp;<a href=/tags/golang/>Golang</a></section><section><span><a href=# onclick=window.history.back()>返回</a></span>&nbsp;|&nbsp;<span><a href=/>主页</a></span></section></div><div class=post-nav><a href=/nginx-404-static-problem/ class=prev rel=prev title=nginx子路径部署遇到404问题><i class="fas fa-angle-left fa-fw"></i>nginx子路径部署遇到404问题</a></div></div><div id=comments><div id=waline class=comment></div><noscript>Please enable JavaScript to view the comments powered by <a href=https://waline.js.org/>Waline</a>.</noscript></div></article></div></main><footer class=footer><div class=footer-container><div class=footer-line>由 <a href=https://gohugo.io/ target=_blank rel="noopener noreffer" title="Hugo 0.110.0">Hugo</a> 强力驱动 | 主题 - <a href=https://github.com/HEIGE-PCloud/DoIt target=_blank rel="noopener noreffer" title="DoIt 0.2.10"><i class="far fa-edit fa-fw"></i> DoIt</a></div><div class=footer-line><i class="far fa-copyright fa-fw"></i><span itemprop=copyrightYear>2020 - 2023</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=https://github.com/jackbai233 target=_blank rel="noopener noreferrer">JackBai</a></span>&nbsp;|&nbsp;<span class=license><a rel="license external nofollow noopener noreffer" href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank>CC BY-NC 4.0</a></span><span class=icp-splitter>&nbsp;|&nbsp;</span><br class=icp-br><span class=icp><a href=https://beian.miit.gov.cn/ target=_blank>陕ICP备2020013535号-2</a></span></div></div></footer></div><div id=fixed-buttons><a href=#back-to-top id=back-to-top-button class=fixed-button title=回到顶部><i class="fas fa-arrow-up fa-fw"></i>
+</a><a href=# id=view-comments class=fixed-button title=查看评论><i class="fas fa-comment fa-fw"></i></a></div><div class=assets><script type=text/javascript src=/lib/autocomplete/autocomplete.min.js></script><script type=text/javascript src=/lib/fuse/fuse.min.js></script><script type=text/javascript src=/lib/lazysizes/lazysizes.min.js></script><script type=text/javascript src=/lib/topbar/topbar.min.js></script><script type=text/javascript src=/lib/pjax/pjax.min.js></script><script type=text/javascript src=/js/theme.min.js></script></div><div class=pjax-assets><script type=text/javascript src=/lib/waline/Waline.min.js></script><script type=text/javascript src=/lib/lightgallery/lightgallery.min.js></script><script type=text/javascript src=/lib/lightgallery/lg-thumbnail.min.js></script><script type=text/javascript src=/lib/lightgallery/lg-zoom.min.js></script><script type=text/javascript src=/lib/clipboard/clipboard.min.js></script><script type=text/javascript src=/lib/sharer/sharer.min.js></script><script type=text/javascript src=/lib/katex/katex.min.js></script><script type=text/javascript src=/lib/katex/auto-render.min.js></script><script type=text/javascript src=/lib/katex/copy-tex.min.js></script><script type=text/javascript src=/lib/katex/mhchem.min.js></script><script type=text/javascript>window.config={code:{copyTitle:"复制到剪贴板",maxShownLines:20},comment:{waline:{copyright:!0,dark:"body[theme='dark'], body[theme='black']",el:"#waline",emoji:["https://cdn.jsdelivr.net/gh/walinejs/emojis/weibo","https://cdn.jsdelivr.net/gh/walinejs/emojis@1.0.0/bilibili"],highlight:!0,lang:"zh-cn",login:"enable",meta:["nick","mail","link"],pageSize:10,serverURL:"https://geekby-comment-gof863phj-jackbai233.vercel.app/",visitor:!0}},lightGallery:{actualSize:!1,exThumbImage:"data-thumbnail",hideBarsDelay:2e3,selector:".lightgallery",speed:400,thumbContHeight:80,thumbWidth:80,thumbnail:!0},math:{delimiters:[{display:!0,left:"$$",right:"$$"},{display:!0,left:"\\[",right:"\\]"},{display:!1,left:"$",right:"$"},{display:!1,left:"\\(",right:"\\)"}],strict:!1},search:{distance:100,findAllMatches:!1,fuseIndexURL:"/index.json",highlightTag:"em",ignoreFieldNorm:!1,ignoreLocation:!1,isCaseSensitive:!1,location:0,maxResultLength:10,minMatchCharLength:2,noResultsFound:"没有找到结果",snippetLength:50,threshold:.3,type:"fuse",useExtendedSearch:!1},sharerjs:!0}</script><link rel=stylesheet href=/lib/lightgallery/lightgallery.min.css><link rel=stylesheet href=/lib/katex/katex.min.css><link rel=stylesheet href=/lib/katex/copy-tex.min.css></div></body></html>
