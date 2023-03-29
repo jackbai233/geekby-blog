@@ -28,5 +28,5 @@ jobs:
         with:
           deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
           publish_dir: ./public
-          # external_repository: username/username.github.io
+          external_repository: jackbai233/jackbai233.github.io
           publish_branch: public
