@@ -10,7 +10,7 @@ hasCJKLanguage = true
 title = "geekbyの自留地"
 
 # 更改使用 Hugo 构建网站时使用的默认主题
-theme = "DoIt"
+theme = "FixIt"
 # 是否使用 emoji 代码
 enableEmoji = true
 [menu]
@@ -59,7 +59,7 @@ enableEmoji = true
     weight = 5
 
 [params]
-  #  LoveIt 主题版本
+  #  FixIt 主题版本
   version = "0.2.X"
   # 网站描述
   description = "天空不曾留下我的痕迹，但我已经飞过~"
@@ -213,6 +213,7 @@ enableEmoji = true
     Twitter = "@geekby1024"
     Weibo = "u/5101801783"
     Email = "hfutbj233@163.com"
+	CSDN = "xiaobai_ol"
     RSS = true # 
 
   #  文章页面配置
@@ -423,6 +424,37 @@ enableEmoji = true
     # 打字结束之后光标的持续时间 (单位是毫秒, "-1" 代表无限大)
     duration = -1
 
+  # FixIt 0.2.12 | 新增 水印配置
+  # 详细参数见 https://github.com/Lruihao/watermark#readme
+  [params.watermark]
+    enable = false
+    # 水印内容（允许 HTML 格式）
+    content = ""
+    # 水印透明度
+    opacity = 0.1
+    # 水印父节点
+    appendTo = ".wrapper>main"
+    # 单水印宽度 单位：px
+    width = 150
+    # 单水印高度 单位：px
+    height = 20
+    # 水印行间距 单位：px
+    rowSpacing = 60
+    # 水印列间距 单位：px
+    colSpacing = 30
+    # 水印旋转角度 单位：deg
+    rotate = 15
+    # 水印字体大小，单位：rem
+    fontSize = 0.85
+    # FixIt 0.2.13 | 新增 水印字体
+    fontFamily = "inherit"
+
+  # FixIt 0.2.12 | 新增 不蒜子统计
+  [params.ibruce]
+    enable = true
+    # 在文章中开启
+    enablePost = true
+
   # 网站验证代码，用于 Google/Bing/Yandex/Pinterest/Baidu
   [params.verification]
     google = ""
@@ -476,6 +508,51 @@ enableEmoji = true
     polyfill = false
     # 是否使用 object-fit-images 来兼容旧式浏览器
     objectFit = false
+
+  # FixIt 0.2.14 | 新增 在左上角或者右上角显示 GitHub 开源链接
+  [params.githubCorner]
+    enable = false
+    permalink = "https://github.com/jackbai233"
+    title = "在 GitHub 上查看源代码"
+    position = "right" # ["left", "right"]
+
+  # FixIt 0.2.14 | 新增 Gravatar 设置
+  [params.gravatar]
+    # FixIt 0.2.18 | 新增 取决于作者邮箱，作者邮箱未设置则使用本地头像
+    enable = false
+    # Gravatar 主机，默认：“www.gravatar.com”
+    host = "www.gravatar.com" # ["cn.gravatar.com", "gravatar.loli.net", ...]
+    style = "" # ["", "mp", "identicon", "monsterid", "wavatar", "retro", "blank", "robohash"]
+
+  # FixIt 0.2.16 | 新增 返回顶部
+  [params.backToTop]
+    enable = true
+    # 在 b2t 按钮中显示滚动百分比
+    scrollpercent = true
+  
+  # FixIt 0.2.16 | 新增 阅读进度条
+  [params.readingProgress]
+    enable = false
+    # 可用值：["left", "right"]
+    start = "left"
+    # 可用值：["top", "bottom"]
+    position = "top"
+    reversed = true
+    light = ""
+    dark = ""
+    height = "2px"
+
+  # FixIt 0.2.17 | 新增 页面加载期间顶部的进度条
+  # 有关详细信息：https://github.com/CodeByZach/pace
+  [params.pace]
+    enable = false
+    # 所有可用颜色：
+    # ["black", "blue", "green", "orange", "pink", "purple", "red", "silver", "white", "yellow"]
+    color = "blue"
+    # 所有可用主题：
+    # ["barber-shop", "big-counter", "bounce", "center-atom", "center-circle", "center-radar", "center-simple",
+    # "corner-indicator", "fill-left", "flash", "flat-top", "loading-bar", "mac-osx", "material", "minimal"]
+    theme = "minimal"
 
 # Hugo 解析文档的配置
 [markup]
