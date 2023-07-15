@@ -1,4 +1,4 @@
-name: build public
+name: build-public
 
 on:
   push:
