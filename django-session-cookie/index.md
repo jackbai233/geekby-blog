@@ -270,3 +270,9 @@ session和cookie都能实现记住用户登录状态的功能，如果为了安�
 
 参考文章：[https://blog.csdn.net/qq_34755081/article/details/82808537](https://blog.csdn.net/qq_34755081/article/details/82808537)
 
+
+---
+
+> 作者: [JackBai](https://github.com/jackbai233)  
+> URL: https://www.geekby.cn/django-session-cookie/  
+

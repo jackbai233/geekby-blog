@@ -170,3 +170,9 @@ def search_tfs_task(title: str, work_type: str = 'Task'):
 更多操作方法请查看[官网](https://devopshq.github.io/tfs/installation.html)
 
 
+
+---
+
+> 作者: [JackBai](https://github.com/jackbai233)  
+> URL: https://www.geekby.cn/python-tfs/  
+

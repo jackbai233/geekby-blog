@@ -149,3 +149,9 @@ MySQL 中的高可用性是一个复杂的主题，需要大量的研究，并�
 8. Galera Cluster 教程：[https://severalnines.com/resources/database-management-tutorials/galera-cluster-mysql-tutorial](https://severalnines.com/resources/database-management-tutorials/galera-cluster-mysql-tutorial)
 9. Galera Cluster 原理：[https://segmentfault.com/a/1190000013652043](https://segmentfault.com/a/1190000013652043)
 10. 官方 MySQL NDB Cluster 介绍：[https://dev.mysql.com/doc/refman/5.7/en/mysql-cluster.html](https://dev.mysql.com/doc/refman/5.7/en/mysql-cluster.html)
+
+---
+
+> 作者: [JackBai](https://github.com/jackbai233)  
+> URL: https://www.geekby.cn/mysql-ha/  
+

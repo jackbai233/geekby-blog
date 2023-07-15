@@ -77,3 +77,9 @@ sudo mount /dev/sdb2 /mnt
 有许多方法和工具来检查磁盘空间，我只是向您展示了最常用的命令行和GUI方法。
 我还解释了一些可能会困扰您理解磁盘使用情况的事情。 希望你会喜欢。
 如果您有任何疑问或建议，可以在评论部分告诉我。
+
+---
+
+> 作者: [JackBai](https://github.com/jackbai233)  
+> URL: https://www.geekby.cn/ubuntu-df-command/  
+

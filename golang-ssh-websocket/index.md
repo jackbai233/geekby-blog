@@ -406,3 +406,9 @@ mounted () {
 
 ## 参考
 1. [gin-web-machine-ws](https://github.com/piupuer/gin-web/blob/dev/api/v1/sys_machine_ws.go)
+
+---
+
+> 作者: [JackBai](https://github.com/jackbai233)  
+> URL: https://www.geekby.cn/golang-ssh-websocket/  
+

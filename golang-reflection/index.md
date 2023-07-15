@@ -257,3 +257,9 @@ fmt.Println(x)
 ## 参考
 1. [laws-of-reflection](https://go.dev/blog/laws-of-reflection)
 2. [go 程序设计语言--反射](https://book.itsfun.top/gopl-zh/ch12/ch12.html)
+
+---
+
+> 作者: [JackBai](https://github.com/jackbai233)  
+> URL: https://www.geekby.cn/golang-reflection/  
+

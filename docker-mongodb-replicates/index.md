@@ -142,3 +142,9 @@ rs.initiate(config)
 
 [https://www.jianshu.com/p/ba63f6c5ad04](https://www.jianshu.com/p/ba63f6c5ad04)
 
+
+---
+
+> 作者: [JackBai](https://github.com/jackbai233)  
+> URL: https://www.geekby.cn/docker-mongodb-replicates/  
+

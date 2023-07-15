@@ -247,3 +247,9 @@ File参数的值 `mysqld-bin.000001`和 Position 参数的值 `3260`需要记录
 ## 附录
 1. MySQL主从复制搭建：[https://www.jianshu.com/p/214893f2bdda](https://www.jianshu.com/p/214893f2bdda)
 2. MySQL主从复制搭建：[https://www.1024sou.com/article/645416.html](https://www.1024sou.com/article/645416.html)
+
+---
+
+> 作者: geekby  
+> URL: https://www.geekby.cn/mysql-replication-deploy/  
+

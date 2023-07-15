@@ -79,3 +79,9 @@ def login(request):
 
 ## 总结
 其实这种实现方式就是让跳转链接在前后端交互中不损失掉。当然也可以在前端不用form元素，直接用ajax的post形式，然后让跳转在前端的ajax逻辑中执行。
+
+---
+
+> 作者: [JackBai](https://github.com/jackbai233)  
+> URL: https://www.geekby.cn/django-login/  
+

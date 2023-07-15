@@ -177,3 +177,9 @@ def modify_jira_duration(issue_key: str, duration: str):
         print(e)
 ```
 
+
+---
+
+> 作者: [JackBai](https://github.com/jackbai233)  
+> URL: https://www.geekby.cn/python-jira-issue/  
+

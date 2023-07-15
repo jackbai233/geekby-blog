@@ -101,3 +101,9 @@ systemctl restart docker
 docker tag my_nginx:v1.0 10.34.56.78/test/my_nginx:v1.0
 docker push 10.34.56.78/test/my_nginx:v1.0
 ```
+
+---
+
+> 作者: [JackBai](https://github.com/jackbai233)  
+> URL: https://www.geekby.cn/harbor-https/  
+

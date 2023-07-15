@@ -93,3 +93,9 @@ DNAT       tcp  --  0.0.0.0/0            0.0.0.0/0            tcp dpt:8086 to:10
 2. [hostPort异常排查](http://liupeng0518.github.io/2018/12/29/k8s/Network/%E5%BC%82%E5%B8%B8%E6%8E%92%E9%94%99/)
 3. [查看iptables表](https://arusso.io/Podman_CNI_Networking_on_CentOS_7/)
 4. [iptables清理](https://www.jianshu.com/p/c8f6fb0314cb)
+
+---
+
+> 作者: [JackBai](https://github.com/jackbai233)  
+> URL: https://www.geekby.cn/k8s-hostport-notwork/  
+

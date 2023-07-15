@@ -442,3 +442,9 @@ setInterval(refresh, 5000);
 ## 最后
 以上的还有好多的dataTables插件的方法没有使用到，[官网](https://datatables.net/examples/basic_init/zero_configuration.html)有很多的使用事例，也非常详细，此处也只是把常用到的进行了归纳。这里多说一句，关于ajax请求后DataTables默认的查询会不起作用，但它会将查询框中的text通过ajax返回，需要自己在后端进行处理。
 以上内容若有错误，请及时指正哈！
+
+---
+
+> 作者: [JackBai](https://github.com/jackbai233)  
+> URL: https://www.geekby.cn/django-datatables/  
+

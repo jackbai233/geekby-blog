@@ -225,3 +225,9 @@ if __name__ == '__main__':
 ```
 ## 总结
 从上面看出，服务端主动通信给客户端，还是逃不过grpc的请求响应方式。上面代码只是实现了一种互相通信的方法，但是没有既充当客户端又充当服务端那种方法简单。
+
+---
+
+> 作者: [JackBai](https://github.com/jackbai233)  
+> URL: https://www.geekby.cn/python-grpc/  
+

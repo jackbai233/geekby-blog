@@ -205,3 +205,9 @@ func main() {
 4. [avast/consul.go](https://github.com/dmcsorley/avast/blob/master/consul.go)
 
 
+
+---
+
+> 作者: [JackBai](https://github.com/jackbai233)  
+> URL: https://www.geekby.cn/consul-watch-golang/  
+

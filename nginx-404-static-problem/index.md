@@ -63,3 +63,9 @@ b. 多加一个`server`，使用方向代理：
 
 ## 参考
 [问题解决1：nginx反向代理丢失js、css问题 - 简书 (jianshu.com)](https://www.jianshu.com/p/f0cdbc691c85)
+
+---
+
+> 作者: geekby  
+> URL: https://www.geekby.cn/nginx-404-static-problem/  
+
