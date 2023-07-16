@@ -248,6 +248,7 @@ enableEmoji = true
     [params.page.code]
       # 是否显示代码块的复制按钮
       copy = true
+      edit = false
       # 默认展开显示的代码行数
       maxShownLines = 20
     #  KaTeX 数学公式
@@ -279,6 +280,21 @@ enableEmoji = true
       scale = true
       # 是否添加 FullscreenControl
       fullscreen = true
+
+    # FixIt 0.2.17 | 新增 赞赏设置
+    [params.page.reward]
+      enable = true
+      animation = true
+      # 相对于页脚的位置，可选值：["before", "after"]
+      position = "after"
+      comment = "Buy me a coffee"
+      # FixIt 0.2.18 | 新增 二维码图片展示模式，可选值：["static", "fixed"]，默认：`static`
+      mode = "fixed"
+      [params.page.reward.ways]
+        wechatpay = "/images/wechatpay.jpg"
+        alipay = "/images/alipay.jpg"
+        # paypal = "/images/paypal.png"
+        # bitcoin = "/images/bitcoin.png"
     #  文章页面的分享信息设置
     [params.page.share]
       enable = true
@@ -312,6 +328,30 @@ enableEmoji = true
     #  评论系统设置
     [params.page.comment]
       enable = true
+      # FixIt 0.2.13 | 新增 Artalk 评论系统设置 (https://artalk.js.org/)
+      [params.page.comment.artalk]
+        enable = true
+        server = "https://www.geekby.cn/artalk"
+        site = "geekbyの自留地"
+        placeholder = ""
+        noComment = ""
+        sendBtn = ""
+        editorTravel = true
+        flatMode = "auto"
+        # FixIt 0.2.17 | 更改 启用 lightgallery 支持
+        lightgallery = false
+        locale = "" # FixIt 0.2.15 | 新增
+        # FixIt 0.2.18 | 新增
+        emoticons = ""
+        nestMax = 2
+        nestSort = "DATE_ASC" # ["DATE_ASC", "DATE_DESC", "VOTE_UP_DESC"]
+        vote = true
+        voteDown = false
+        uaBadge = true
+        listSort = true
+        imgUpload = true
+        preview = true
+        versionCheck = true
       # Disqus 评论系统设置
       [params.page.comment.disqus]
         # 
@@ -350,7 +390,7 @@ enableEmoji = true
       # Waline comment config (https://waline.js.org)
       # Waline 评论系统设置 (https://waline.js.org)
       [params.page.comment.waline]
-        enable = true
+        enable = false
         serverURL = "https://geekby-comment-gof863phj-jackbai233.vercel.app/"
         visitor = true
         emoji = ['https://cdn.jsdelivr.net/gh/walinejs/emojis/weibo', 'https://cdn.jsdelivr.net/gh/walinejs/emojis@1.0.0/bilibili']
@@ -424,12 +464,18 @@ enableEmoji = true
     # 打字结束之后光标的持续时间 (单位是毫秒, "-1" 代表无限大)
     duration = -1
 
+  # FixIt 0.2.12 | 新增 盘古之白配置
+  [params.pangu]
+    # 适用于中文写作用户
+    enable = true
+    selector = "article" 
+
   # FixIt 0.2.12 | 新增 水印配置
   # 详细参数见 https://github.com/Lruihao/watermark#readme
   [params.watermark]
     enable = false
     # 水印内容（允许 HTML 格式）
-    content = ""
+    content = "geekbyの自留地"
     # 水印透明度
     opacity = 0.1
     # 水印父节点
@@ -545,7 +591,7 @@ enableEmoji = true
   # FixIt 0.2.17 | 新增 页面加载期间顶部的进度条
   # 有关详细信息：https://github.com/CodeByZach/pace
   [params.pace]
-    enable = false
+    enable = true
     # 所有可用颜色：
     # ["black", "blue", "green", "orange", "pink", "purple", "red", "silver", "white", "yellow"]
     color = "blue"
