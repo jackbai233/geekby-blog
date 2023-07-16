@@ -331,7 +331,7 @@ enableEmoji = true
       # FixIt 0.2.13 | 新增 Artalk 评论系统设置 (https://artalk.js.org/)
       [params.page.comment.artalk]
         enable = true
-        server = "http://42.192.92.82:10003"
+        server = "https://www.geekby.cn/artalk"
         site = "geekbyの自留地"
         placeholder = ""
         noComment = ""
