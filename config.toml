@@ -439,13 +439,13 @@ enableEmoji = true
         # 位于 "assets/"
         # 或者
         # someCSS = "https://cdn.example.com/some.css"
-		artalkCSS = "lib/artalk/Artalk.css"
+		    artalkCSS = "https://cdn.bootcdn.net/ajax/libs/artalk/2.5.5/Artalk.css"
       [params.page.library.js]
         # someJavascript = "some.js"
         # 位于 "assets/"
         # 或者
         # someJavascript = "https://cdn.example.com/some.js"
-		artalkJS = "lib/artalk/Artalk.js"
+		    artalkJS = "https://cdn.bootcdn.net/ajax/libs/artalk/2.5.5/Artalk.js"
     #  页面 SEO 配置
     [params.page.seo]
       # 图片 URL
