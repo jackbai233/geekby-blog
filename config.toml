@@ -501,7 +501,7 @@ enableEmoji = true
   [params.ibruce]
     enable = true
     # 在文章中开启
-    enablePost = true
+    enablePost = false
 
   # 网站验证代码，用于 Google/Bing/Yandex/Pinterest/Baidu
   [params.verification]
